@@ -1,0 +1,16 @@
+# OS General
+Thumbs.db
+.DS_Store
+
+# project
+*.cert
+*.key
+*.log
+
+# Develop tools
+.vscode/
+.idea/
+*.swp
+
+# Maven generated artifacts
+target/
