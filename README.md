@@ -46,6 +46,6 @@ uni.onItem().invoke(() -> {
 ## Build
 This is a maven build, so do the usual things, e.g.
 ```
-mvn clean package
+./mvnw clean package
 ```
 for a jar.
