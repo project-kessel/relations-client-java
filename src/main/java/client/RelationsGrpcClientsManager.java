@@ -10,7 +10,7 @@ public class RelationsGrpcClientsManager {
 
     private final ManagedChannel channel;
 
-    public static RelationsGrpcClientsManager forInsecureClients(String targetUrl) {
+    public static synchronized RelationsGrpcClientsManager forInsecureClients(String targetUrl) {
         if (!insecureManagers.containsKey(targetUrl)) {
             var manager = new RelationsGrpcClientsManager(targetUrl, InsecureChannelCredentials.create());
             insecureManagers.put(targetUrl, manager);
@@ -18,13 +18,45 @@ public class RelationsGrpcClientsManager {
         return insecureManagers.get(targetUrl);
     }
 
-    public static RelationsGrpcClientsManager forSecureClients(String targetUrl) {
+    public static synchronized RelationsGrpcClientsManager forSecureClients(String targetUrl) {
         if (!secureManagers.containsKey(targetUrl)) {
             var tlsChannelCredentials = TlsChannelCredentials.create();
             var manager = new RelationsGrpcClientsManager(targetUrl, tlsChannelCredentials);
             secureManagers.put(targetUrl, manager);
         }
         return secureManagers.get(targetUrl);
+    }
+
+    public static synchronized void shutdownAll() {
+        for (var manager : insecureManagers.values()) {
+            manager.closeClientChannel();
+        }
+        insecureManagers.clear();
+        for (var manager : secureManagers.values()) {
+            manager.closeClientChannel();
+        }
+        secureManagers.clear();
+    }
+
+    public static synchronized void shutdownManager(RelationsGrpcClientsManager managerToShutdown) {
+        var iter = insecureManagers.entrySet().iterator();
+        while (iter.hasNext()) {
+            var entry = iter.next();
+            if(entry.getValue().channel == managerToShutdown.channel) {
+                entry.getValue().closeClientChannel();
+                iter.remove();
+                return;
+            }
+        }
+        iter = secureManagers.entrySet().iterator();
+        while (iter.hasNext()) {
+            var entry = iter.next();
+            if(entry.getValue().channel == managerToShutdown.channel) {
+                entry.getValue().closeClientChannel();
+                iter.remove();
+                return;
+            }
+        }
     }
 
     /**
@@ -38,11 +70,9 @@ public class RelationsGrpcClientsManager {
         this.channel = Grpc.newChannelBuilder(targetUrl, credentials).build();
     }
 
-    /**
-     * TBD: lifecycle of RelationsGrpcClientsManager and channel needs a little thought.
-     */
-
-
+    private void closeClientChannel() {
+        channel.shutdown();
+    }
 
     public CheckClient getCheckClient() {
         return new CheckClient(channel);

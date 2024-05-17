@@ -5,7 +5,6 @@ import api.check.v1.CheckRequest;
 import api.check.v1.CheckResponse;
 import io.grpc.Channel;
 import io.grpc.stub.StreamObserver;
-import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.operators.multi.processors.UnicastProcessor;
 

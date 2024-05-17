@@ -12,7 +12,6 @@ import io.grpc.stub.StreamObserver;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.operators.multi.processors.UnicastProcessor;
 
-
 public class RelationTuplesClient {
     private final RelationshipsGrpc.RelationshipsStub asyncStub;
     private final RelationshipsGrpc.RelationshipsBlockingStub blockingStub;
