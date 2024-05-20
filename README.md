@@ -4,14 +4,31 @@ Java client library for the relations api.
 This library wraps the grpc stubs and channels and provides individual clients for the relations grpc services. A ```RelationsGrpcClientManager``` manages the grpc connection and provides the per-service clients.
 
 ## Usage
-### Vanilla java
+### CDI / Quarkus
 
-Synchronous:
+```java
+@Inject
+CheckClient checkClient;
+```
+Quarkus configuration: `application.properties` (also containers using smallrye)
+```application.properties
+relations-api.target-url=localhost:9000
+relations-api.is-secure-clients=false
+```
+For non-quarkus/smallrye CDI, `@Config config` must be provided using custom wiring.
+
+Note: if you want more than one connection configured, you need to use the RelationsGrpcClientsManager
+directly (see below).
+
+### Vanilla java
 
 ```java
 var clientsManager = RelationsGrpcClientsManager.forInsecureClients(url);
 var checkClient = clientsManager.getCheckClient();
-
+```
+### Making requests
+Synchronous:
+```java
 var checkRequest = CheckRequest.newBuilder()
                 .setSubject(SubjectReference.newBuilder()
                                 .setObject(ObjectReference.newBuilder()
