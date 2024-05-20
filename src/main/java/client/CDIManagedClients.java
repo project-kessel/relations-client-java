@@ -1,9 +1,8 @@
 package client;
 
-import jakarta.annotation.PreDestroy;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Disposes;
 import jakarta.enterprise.inject.Produces;
-import jakarta.inject.Inject;
 
 /**
  * A managed bean for providing relations api clients for injection in apps.
@@ -14,10 +13,8 @@ import jakarta.inject.Inject;
  */
 @ApplicationScoped
 public class CDIManagedClients {
-    @Inject
-    Config config;
-
-    private RelationsGrpcClientsManager getManager() {
+    @Produces
+    public RelationsGrpcClientsManager getManager(Config config) {
         var isSecureClients = config.isSecureClients();
         var targetUrl = config.targetUrl();
 
@@ -28,18 +25,17 @@ public class CDIManagedClients {
         return RelationsGrpcClientsManager.forInsecureClients(targetUrl);
     }
 
-    @PreDestroy
-    void shutdownClientsManager() {
-        RelationsGrpcClientsManager.shutdownManager(getManager());
+    void shutdownClientsManager(@Disposes RelationsGrpcClientsManager manager) {
+        RelationsGrpcClientsManager.shutdownManager(manager);
     }
 
     @Produces
-    public CheckClient getCheckClient() {
-        return getManager().getCheckClient();
+    public CheckClient getCheckClient(RelationsGrpcClientsManager manager) {
+        return manager.getCheckClient();
     }
 
     @Produces
-    public RelationTuplesClient getRelationsClient() {
-        return getManager().getRelationTuplesClient();
+    public RelationTuplesClient getRelationsClient(RelationsGrpcClientsManager manager) {
+        return manager.getRelationTuplesClient();
     }
 }
