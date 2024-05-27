@@ -67,6 +67,13 @@
       <version>5.10.2</version>
       <scope>test</scope>
     </dependency>
+    <!-- Use Weld as a CDI container for CDI testing. -->
+    <dependency>
+      <groupId>org.jboss.weld</groupId>
+      <artifactId>weld-junit5</artifactId>
+      <version>4.0.3.Final</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
