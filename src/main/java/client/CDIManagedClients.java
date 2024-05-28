@@ -14,6 +14,7 @@ import jakarta.enterprise.inject.Produces;
 @ApplicationScoped
 public class CDIManagedClients {
     @Produces
+    @ApplicationScoped
     RelationsGrpcClientsManager getManager(Config config) {
         var isSecureClients = config.isSecureClients();
         var targetUrl = config.targetUrl();
@@ -30,11 +31,13 @@ public class CDIManagedClients {
     }
 
     @Produces
+    @ApplicationScoped
     CheckClient getCheckClient(RelationsGrpcClientsManager manager) {
         return manager.getCheckClient();
     }
 
     @Produces
+    @ApplicationScoped
     RelationTuplesClient getRelationsClient(RelationsGrpcClientsManager manager) {
         return manager.getRelationTuplesClient();
     }
