@@ -1,4 +1,4 @@
-package client;
+package org.project_kessel.relations.client;
 
 import org.project_kessel.api.relations.v0.KesselTupleServiceGrpc;
 import org.project_kessel.api.relations.v0.CreateTuplesRequest;

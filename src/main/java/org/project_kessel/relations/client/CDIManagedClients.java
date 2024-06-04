@@ -1,4 +1,4 @@
-package client;
+package org.project_kessel.relations.client;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Disposes;

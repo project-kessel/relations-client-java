@@ -1,4 +1,4 @@
-package client;
+package org.project_kessel.relations.client;
 
 import io.smallrye.config.ConfigMapping;
 import io.smallrye.config.WithDefault;

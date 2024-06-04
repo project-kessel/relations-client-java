@@ -1,8 +1,7 @@
+package org.project_kessel.relations.client;
+
 import org.project_kessel.api.relations.v0.KesselCheckServiceGrpc;
 import org.project_kessel.api.relations.v0.KesselTupleServiceGrpc;
-import client.CheckClient;
-import client.RelationTuplesClient;
-import client.RelationsGrpcClientsManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

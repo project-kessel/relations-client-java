@@ -1,9 +1,9 @@
-package example;
+package org.project_kessel.relations.example;
 
 import org.project_kessel.api.relations.v0.CheckRequest;
 import org.project_kessel.api.relations.v0.CheckResponse;
 import org.project_kessel.api.relations.v0.*;
-import client.RelationsGrpcClientsManager;
+import org.project_kessel.relations.client.RelationsGrpcClientsManager;
 import io.grpc.stub.StreamObserver;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;

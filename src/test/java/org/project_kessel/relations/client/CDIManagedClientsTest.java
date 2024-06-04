@@ -1,7 +1,6 @@
+package org.project_kessel.relations.client;
+
 import org.project_kessel.api.relations.v0.*;
-import client.CheckClient;
-import client.Config;
-import client.RelationTuplesClient;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
