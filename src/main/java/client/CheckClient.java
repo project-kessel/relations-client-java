@@ -1,8 +1,8 @@
 package client;
 
-import api.check.v1.CheckGrpc;
-import api.check.v1.CheckRequest;
-import api.check.v1.CheckResponse;
+import org.project_kessel.api.relations.v0.KesselCheckServiceGrpc;
+import org.project_kessel.api.relations.v0.CheckRequest;
+import org.project_kessel.api.relations.v0.CheckResponse;
 import io.grpc.Channel;
 import io.grpc.stub.StreamObserver;
 import io.smallrye.mutiny.Uni;
@@ -13,12 +13,12 @@ import java.util.logging.Logger;
 public class CheckClient {
     private static final Logger logger = Logger.getLogger(CheckClient.class.getName());
 
-    private final CheckGrpc.CheckStub asyncStub;
-    private final CheckGrpc.CheckBlockingStub blockingStub;
+    private final KesselCheckServiceGrpc.KesselCheckServiceStub asyncStub;
+    private final KesselCheckServiceGrpc.KesselCheckServiceBlockingStub blockingStub;
 
     CheckClient(Channel channel) {
-        asyncStub = CheckGrpc.newStub(channel);
-        blockingStub = CheckGrpc.newBlockingStub(channel);
+        asyncStub = KesselCheckServiceGrpc.newStub(channel);
+        blockingStub = KesselCheckServiceGrpc.newBlockingStub(channel);
     }
 
     public void check(CheckRequest request,

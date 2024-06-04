@@ -1,71 +1,73 @@
 package client;
 
-import api.relations.v1.RelationshipsGrpc;
-import api.relations.v1.CreateRelationshipsRequest;
-import api.relations.v1.ReadRelationshipsRequest;
-import api.relations.v1.DeleteRelationshipsRequest;
-import api.relations.v1.CreateRelationshipsResponse;
-import api.relations.v1.ReadRelationshipsResponse;
-import api.relations.v1.DeleteRelationshipsResponse;
+import org.project_kessel.api.relations.v0.KesselTupleServiceGrpc;
+import org.project_kessel.api.relations.v0.CreateTuplesRequest;
+import org.project_kessel.api.relations.v0.ReadTuplesRequest;
+import org.project_kessel.api.relations.v0.DeleteTuplesRequest;
+import org.project_kessel.api.relations.v0.CreateTuplesResponse;
+import org.project_kessel.api.relations.v0.ReadTuplesResponse;
+import org.project_kessel.api.relations.v0.DeleteTuplesResponse;
 import io.grpc.Channel;
 import io.grpc.stub.StreamObserver;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.operators.multi.processors.UnicastProcessor;
 
+import java.util.Iterator;
+
 public class RelationTuplesClient {
-    private final RelationshipsGrpc.RelationshipsStub asyncStub;
-    private final RelationshipsGrpc.RelationshipsBlockingStub blockingStub;
+    private final KesselTupleServiceGrpc.KesselTupleServiceStub asyncStub;
+    private final KesselTupleServiceGrpc.KesselTupleServiceBlockingStub blockingStub;
 
     RelationTuplesClient(Channel channel) {
-        asyncStub = RelationshipsGrpc.newStub(channel);
-        blockingStub = RelationshipsGrpc.newBlockingStub(channel);
+        asyncStub = KesselTupleServiceGrpc.newStub(channel);
+        blockingStub = KesselTupleServiceGrpc.newBlockingStub(channel);
     }
 
     /**
      */
-    public void createRelationships(CreateRelationshipsRequest request,
-                                    StreamObserver<CreateRelationshipsResponse> responseObserver) {
-        asyncStub.createRelationships(request, responseObserver);
+    public void createTuples(CreateTuplesRequest request,
+                             StreamObserver<CreateTuplesResponse> responseObserver) {
+        asyncStub.createTuples(request, responseObserver);
     }
 
     /**
      */
-    public void readRelationships(ReadRelationshipsRequest request,
-                                  StreamObserver<ReadRelationshipsResponse> responseObserver) {
-        asyncStub.readRelationships(request, responseObserver);
+    public void readTuples(ReadTuplesRequest request,
+                           StreamObserver<ReadTuplesResponse> responseObserver) {
+        asyncStub.readTuples(request, responseObserver);
     }
 
     /**
      */
-    public void deleteRelationships(DeleteRelationshipsRequest request,
-                                    StreamObserver<DeleteRelationshipsResponse> responseObserver) {
-        asyncStub.deleteRelationships(request, responseObserver);
+    public void deleteTuples(DeleteTuplesRequest request,
+                             StreamObserver<DeleteTuplesResponse> responseObserver) {
+        asyncStub.deleteTuples(request, responseObserver);
     }
 
     /**
      */
-    public CreateRelationshipsResponse createRelationships(CreateRelationshipsRequest request) {
-        return blockingStub.createRelationships(request);
+    public CreateTuplesResponse createTuples(CreateTuplesRequest request) {
+        return blockingStub.createTuples(request);
     }
 
     /**
      */
-    public ReadRelationshipsResponse readRelationships(ReadRelationshipsRequest request) {
-        return blockingStub.readRelationships(request);
+    public Iterator<ReadTuplesResponse> readTuples(ReadTuplesRequest request) {
+        return blockingStub.readTuples(request);
     }
 
     /**
      */
-    public DeleteRelationshipsResponse deleteRelationships(DeleteRelationshipsRequest request) {
-        return blockingStub.deleteRelationships(request);
+    public DeleteTuplesResponse deleteTuples(DeleteTuplesRequest request) {
+        return blockingStub.deleteTuples(request);
     }
 
-    public Multi<ReadRelationshipsResponse> readRelationshipsMulti(ReadRelationshipsRequest request) {
-        final UnicastProcessor<ReadRelationshipsResponse> responseProcessor = UnicastProcessor.create();
+    public Multi<ReadTuplesResponse> readTuplesMulti(ReadTuplesRequest request) {
+        final UnicastProcessor<ReadTuplesResponse> responseProcessor = UnicastProcessor.create();
 
-        var streamObserver = new StreamObserver<ReadRelationshipsResponse>() {
+        var streamObserver = new StreamObserver<ReadTuplesResponse>() {
             @Override
-            public void onNext(ReadRelationshipsResponse response) {
+            public void onNext(ReadTuplesResponse response) {
                 responseProcessor.onNext(response);
             }
 
@@ -81,7 +83,7 @@ public class RelationTuplesClient {
         };
 
         var multi = Multi.createFrom().publisher(responseProcessor);
-        readRelationships(request, streamObserver);
+        readTuples(request, streamObserver);
 
         return multi;
     }

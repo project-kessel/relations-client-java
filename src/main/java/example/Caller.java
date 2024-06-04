@@ -1,15 +1,19 @@
 package example;
 
-import api.check.v1.CheckRequest;
-import api.check.v1.CheckResponse;
-import api.relations.v1.*;
+import org.project_kessel.api.relations.v0.CheckRequest;
+import org.project_kessel.api.relations.v0.CheckResponse;
+import org.project_kessel.api.relations.v0.*;
 import client.RelationsGrpcClientsManager;
 import io.grpc.stub.StreamObserver;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 public class Caller {
 
@@ -25,13 +29,15 @@ public class Caller {
 
         var checkRequest = CheckRequest.newBuilder()
                 .setSubject(SubjectReference.newBuilder()
-                                .setObject(ObjectReference.newBuilder()
-                                        .setType("user")
+                                .setSubject(ObjectReference.newBuilder()
+                                        .setType(ObjectType.newBuilder()
+                                                .setType("user").build())
                                         .setId(userName).build())
                                 .build())
                 .setRelation(permission)
-                .setObject(ObjectReference.newBuilder()
-                        .setType("thing")
+                .setResource(ObjectReference.newBuilder()
+                        .setType(ObjectType.newBuilder()
+                                .setType("thing").build())
                         .setId(thing)
                         .build())
                 .build();
@@ -119,22 +125,21 @@ public class Caller {
         var clientsManager = RelationsGrpcClientsManager.forInsecureClients(url);
         var relationTuplesClient = clientsManager.getRelationTuplesClient();
 
-        var roleBindingsOnWorkspaceFilter = RelationshipFilter.newBuilder()
-                .setObjectType("role_binding").build();
-        var readRelationshipsRequest = ReadRelationshipsRequest.newBuilder()
+        var roleBindingsOnWorkspaceFilter = RelationTupleFilter.newBuilder()
+                .setResourceType("role_binding").build();
+        var readRelationshipsRequest = ReadTuplesRequest.newBuilder()
                 .setFilter(roleBindingsOnWorkspaceFilter).build();
 
         /*
          * Blocking
          */
 
-        var response = relationTuplesClient.readRelationships(readRelationshipsRequest);
+        var responseIterator = relationTuplesClient.readTuples(readRelationshipsRequest);
+        Iterable<ReadTuplesResponse> iterable = () -> responseIterator;
 
-        /* We could make this a stream rather than a list -- which is implied/inferred from
-         * the proto -- but for the blocking call there is obviously no concurrency benefit.
-         * List may also change, because I think we need a proto spec change here to specify a stream.
-         * */
-        var relationshipTuples = response.getRelationshipsList();
+        var relationshipTuples = StreamSupport.stream(iterable.spliterator(), false)
+                .map(ReadTuplesResponse::getTuple)
+                .collect(Collectors.toList());
         System.out.println("Blocking relationship tuples: " + relationshipTuples);
 
         /*
@@ -142,14 +147,16 @@ public class Caller {
          */
 
         final CountDownLatch conditionLatch = new CountDownLatch(1);
-        var streamObserver = new StreamObserver<ReadRelationshipsResponse>() {
+        final List<ReadTuplesResponse> responses = Collections.synchronizedList(new ArrayList<>());
+        var streamObserver = new StreamObserver<ReadTuplesResponse>() {
             @Override
-            public void onNext(ReadRelationshipsResponse response) {
-                /* Because we don't return a stream, but a response object with all the relationships inside,
-                 * we get no benefit from an async/non-blocking call right now. It all returns at once.
-                 */
-                var relationshipTuples = response.getRelationshipsList();
-                System.out.println("Non-blocking relationship tuples: " + relationshipTuples);
+            public void onNext(ReadTuplesResponse response) {
+                // do something async
+                var tuple = response.getTuple();
+                System.out.println("Non-blocking relationship tuples: " + tuple);
+
+                // add response to list to follow-up on main thread
+                responses.add(response);
             }
 
             @Override
@@ -162,11 +169,13 @@ public class Caller {
                 conditionLatch.countDown();
             }
         };
-        relationTuplesClient.readRelationships(readRelationshipsRequest, streamObserver);
+        relationTuplesClient.readTuples(readRelationshipsRequest, streamObserver);
 
         /* Use a passed-in countdownlatch to wait for the result async on the main thread */
         try {
             conditionLatch.await();
+
+            System.out.println("Collected non-blocking responses: " + responses);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -175,15 +184,17 @@ public class Caller {
          * Non-blocking reactive style
          */
 
-        Multi<ReadRelationshipsResponse> multi = relationTuplesClient.readRelationshipsMulti(readRelationshipsRequest);
+        Multi<ReadTuplesResponse> multi = relationTuplesClient.readTuplesMulti(readRelationshipsRequest);
 
         /* Pattern where we may want collect all the responses, but still operate on each as it comes in. */
-        List<ReadRelationshipsResponse> list = multi.onItem()
-                .invoke(() -> {
-                    var tuples = response.getRelationshipsList();
-                    System.out.println("Reactive non-blocking relationship tuples: " + tuples);
+        List<ReadTuplesResponse> responses2 = multi.onItem()
+                .invoke(response -> {
+                    var tuple = response.getTuple();
+                    System.out.println("Reactive non-blocking relationship tuples: " + tuple);
                 })
                 .collect().asList().await().indefinitely();
+
+        System.out.println("Collected reactive non-blocking responses: " + responses2);
 
     }
 

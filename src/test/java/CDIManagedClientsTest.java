@@ -1,7 +1,4 @@
-import api.check.v1.CheckGrpc;
-import api.check.v1.CheckRequest;
-import api.check.v1.CheckResponse;
-import api.relations.v1.*;
+import org.project_kessel.api.relations.v0.*;
 import client.CheckClient;
 import client.Config;
 import client.RelationTuplesClient;
@@ -46,19 +43,23 @@ public class CDIManagedClientsTest {
     @BeforeAll
     static void setup() throws IOException {
         ServerBuilder<?> serverBuilder = ServerBuilder.forPort(testServerPort);
-        serverBuilder.addService(new CheckGrpc.CheckImplBase() {
+        serverBuilder.addService(new KesselCheckServiceGrpc.KesselCheckServiceImplBase() {
             @Override
             public void check(CheckRequest request, StreamObserver<CheckResponse> responseObserver) {
                 responseObserver.onNext(CheckResponse.newBuilder().setAllowed(CheckResponse.Allowed.ALLOWED_TRUE).build());
                 responseObserver.onCompleted();
             }
         });
-        serverBuilder.addService(new RelationshipsGrpc.RelationshipsImplBase() {
+        serverBuilder.addService(new KesselTupleServiceGrpc.KesselTupleServiceImplBase() {
             @Override
-            public void readRelationships(ReadRelationshipsRequest request, StreamObserver<ReadRelationshipsResponse> responseObserver) {
-                responseObserver.onNext(ReadRelationshipsResponse.newBuilder().addRelationships(
-                        Relationship.newBuilder().setObject(ObjectReference.newBuilder().setType("TestType").build()).build()
-                ).build());
+            public void readTuples(ReadTuplesRequest request, StreamObserver<ReadTuplesResponse> responseObserver) {
+                responseObserver.onNext(ReadTuplesResponse.newBuilder().setTuple(
+                        Relationship.newBuilder().setResource(
+                                ObjectReference.newBuilder().setType(
+                                        ObjectType.newBuilder().setType("TestType"))
+                                        .build())
+                                .build())
+                        .build());
                 responseObserver.onCompleted();
             }
         });
@@ -76,10 +77,10 @@ public class CDIManagedClientsTest {
     @Test
     public void basicCDIWiringTest() {
         var checkResponse = checkClient.check(CheckRequest.getDefaultInstance());
-        var relationTuplesResponse = relationTuplesClient.readRelationships(ReadRelationshipsRequest.getDefaultInstance());
+        var relationTuplesResponse = relationTuplesClient.readTuples(ReadTuplesRequest.getDefaultInstance());
 
         assertEquals(CheckResponse.Allowed.ALLOWED_TRUE, checkResponse.getAllowed());
-        assertEquals("TestType", relationTuplesResponse.getRelationships(0).getObject().getType());
+        assertEquals("TestType", relationTuplesResponse.next().getTuple().getResource().getType().getType());
     }
 
     /*

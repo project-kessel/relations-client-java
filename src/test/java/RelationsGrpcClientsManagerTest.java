@@ -1,5 +1,5 @@
-import api.check.v1.CheckGrpc;
-import api.relations.v1.RelationshipsGrpc;
+import org.project_kessel.api.relations.v0.KesselCheckServiceGrpc;
+import org.project_kessel.api.relations.v0.KesselTupleServiceGrpc;
 import client.CheckClient;
 import client.RelationTuplesClient;
 import client.RelationsGrpcClientsManager;
@@ -145,10 +145,10 @@ public class RelationsGrpcClientsManagerTest {
 
         var checkAsyncStubField = CheckClient.class.getDeclaredField("asyncStub");
         checkAsyncStubField.setAccessible(true);
-        var checkChannel = ((CheckGrpc.CheckStub)checkAsyncStubField.get(checkClient)).getChannel();
+        var checkChannel = ((KesselCheckServiceGrpc.KesselCheckServiceStub)checkAsyncStubField.get(checkClient)).getChannel();
         var relationTuplesAsyncStubField = RelationTuplesClient.class.getDeclaredField("asyncStub");
         relationTuplesAsyncStubField.setAccessible(true);
-        var relationTuplesChannel = ((RelationshipsGrpc.RelationshipsStub)relationTuplesAsyncStubField.get(relationTuplesClient)).getChannel();
+        var relationTuplesChannel = ((KesselTupleServiceGrpc.KesselTupleServiceStub)relationTuplesAsyncStubField.get(relationTuplesClient)).getChannel();
 
         assertEquals(checkChannel, relationTuplesChannel);
     }
