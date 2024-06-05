@@ -153,7 +153,7 @@ public class Caller {
             public void onNext(ReadTuplesResponse response) {
                 // do something async
                 var tuple = response.getTuple();
-                System.out.println("Non-blocking relationship tuples: " + tuple);
+                System.out.println("Non-blocking relationship tuple: " + tuple);
 
                 // add response to list to follow-up on main thread
                 responses.add(response);
