@@ -55,7 +55,7 @@ public class CDIManagedClientsTest {
                 responseObserver.onNext(ReadTuplesResponse.newBuilder().setTuple(
                         Relationship.newBuilder().setResource(
                                 ObjectReference.newBuilder().setType(
-                                        ObjectType.newBuilder().setType("TestType"))
+                                        ObjectType.newBuilder().setName("TestType"))
                                         .build())
                                 .build())
                         .build());
@@ -79,7 +79,7 @@ public class CDIManagedClientsTest {
         var relationTuplesResponse = relationTuplesClient.readTuples(ReadTuplesRequest.getDefaultInstance());
 
         assertEquals(CheckResponse.Allowed.ALLOWED_TRUE, checkResponse.getAllowed());
-        assertEquals("TestType", relationTuplesResponse.next().getTuple().getResource().getType().getType());
+        assertEquals("TestType", relationTuplesResponse.next().getTuple().getResource().getType().getName());
     }
 
     /*
