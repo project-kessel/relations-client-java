@@ -38,4 +38,9 @@ public class CDIManagedClients {
     RelationTuplesClient getRelationsClient(RelationsGrpcClientsManager manager) {
         return manager.getRelationTuplesClient();
     }
+
+    @Produces
+    LookupClient getLookupClient(RelationsGrpcClientsManager manager) {
+        return manager.getLookupClient();
+    }
 }
