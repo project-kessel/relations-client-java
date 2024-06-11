@@ -82,4 +82,8 @@ public class RelationsGrpcClientsManager {
         return new RelationTuplesClient(channel);
     }
 
+    public LookupClient getLookupClient() {
+        return new LookupClient(channel);
+    }
+
 }

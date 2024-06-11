@@ -34,6 +34,9 @@ public class CDIManagedClientsTest {
     @Inject
     RelationTuplesClient relationTuplesClient;
 
+    @Inject
+    LookupClient lookupClient;
+
     private static Server grpcServer;
 
     /*
@@ -42,6 +45,7 @@ public class CDIManagedClientsTest {
     @BeforeAll
     static void setup() throws IOException {
         ServerBuilder<?> serverBuilder = ServerBuilder.forPort(testServerPort);
+
         serverBuilder.addService(new KesselCheckServiceGrpc.KesselCheckServiceImplBase() {
             @Override
             public void check(CheckRequest request, StreamObserver<CheckResponse> responseObserver) {
@@ -62,6 +66,19 @@ public class CDIManagedClientsTest {
                 responseObserver.onCompleted();
             }
         });
+        serverBuilder.addService(new KesselLookupServiceGrpc.KesselLookupServiceImplBase() {
+            @Override
+            public void lookupSubjects(LookupSubjectsRequest request, StreamObserver<LookupSubjectsResponse> responseObserver) {
+                responseObserver.onNext(LookupSubjectsResponse.newBuilder().setSubject(
+                        SubjectReference.newBuilder().setSubject(
+                                ObjectReference.newBuilder().setId("TestSubjectId")
+                                        .build())
+                                .build())
+                        .build());
+                responseObserver.onCompleted();
+            }
+        });
+
         grpcServer = serverBuilder.build();
         grpcServer.start();
     }
@@ -75,11 +92,14 @@ public class CDIManagedClientsTest {
 
     @Test
     public void basicCDIWiringTest() {
+        /* Make some calls to dummy services in test grpc server to test injected clients */
         var checkResponse = checkClient.check(CheckRequest.getDefaultInstance());
         var relationTuplesResponse = relationTuplesClient.readTuples(ReadTuplesRequest.getDefaultInstance());
+        var lookupResponse = lookupClient.lookupSubjects(LookupSubjectsRequest.getDefaultInstance());
 
         assertEquals(CheckResponse.Allowed.ALLOWED_TRUE, checkResponse.getAllowed());
         assertEquals("TestType", relationTuplesResponse.next().getTuple().getResource().getType().getName());
+        assertEquals("TestSubjectId", lookupResponse.next().getSubject().getSubject().getId());
     }
 
     /*

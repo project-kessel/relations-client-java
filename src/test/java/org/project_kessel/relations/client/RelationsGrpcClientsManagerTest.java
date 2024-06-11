@@ -1,6 +1,7 @@
 package org.project_kessel.relations.client;
 
 import org.project_kessel.api.relations.v0.KesselCheckServiceGrpc;
+import org.project_kessel.api.relations.v0.KesselLookupServiceGrpc;
 import org.project_kessel.api.relations.v0.KesselTupleServiceGrpc;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -54,8 +55,6 @@ public class RelationsGrpcClientsManagerTest {
     public void testThreadingChaos() {
         /* Basic testing to ensure that we don't get ConcurrentModificationExceptions, or any other exceptions, when
          * creating and destroying managers on different threads. */
-
-
 
         try {
             Hashtable<String,RelationsGrpcClientsManager> managers = new Hashtable<>();
@@ -141,6 +140,7 @@ public class RelationsGrpcClientsManagerTest {
         var manager = RelationsGrpcClientsManager.forInsecureClients("localhost:8080");
         var checkClient = manager.getCheckClient();
         var relationTuplesClient = manager.getRelationTuplesClient();
+        var lookupClient = manager.getLookupClient();
 
         var checkAsyncStubField = CheckClient.class.getDeclaredField("asyncStub");
         checkAsyncStubField.setAccessible(true);
@@ -148,8 +148,12 @@ public class RelationsGrpcClientsManagerTest {
         var relationTuplesAsyncStubField = RelationTuplesClient.class.getDeclaredField("asyncStub");
         relationTuplesAsyncStubField.setAccessible(true);
         var relationTuplesChannel = ((KesselTupleServiceGrpc.KesselTupleServiceStub)relationTuplesAsyncStubField.get(relationTuplesClient)).getChannel();
+        var lookupAsyncStubField = LookupClient.class.getDeclaredField("asyncStub");
+        lookupAsyncStubField.setAccessible(true);
+        var lookupChannel = ((KesselLookupServiceGrpc.KesselLookupServiceStub)lookupAsyncStubField.get(lookupClient)).getChannel();
 
         assertEquals(checkChannel, relationTuplesChannel);
+        assertEquals(lookupChannel, relationTuplesChannel);
     }
 
     @Test
