@@ -213,7 +213,7 @@ public class Caller {
         ).setRelation("view").setSubjectType(ObjectType.newBuilder().setName("user")).build();
 
         /*
-         * Non-blocking
+         * Blocking
          */
 
         var subjectsIterator = lookupClient.lookupSubjects(lookupSubjectsRequest);
