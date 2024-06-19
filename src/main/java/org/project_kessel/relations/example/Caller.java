@@ -116,6 +116,7 @@ public class Caller {
                 .await().indefinitely();
 
         getRelationshipsExample();
+        lookupSubjectsExample();
     }
 
     public static void getRelationshipsExample() {
@@ -196,6 +197,48 @@ public class Caller {
 
         System.out.println("Collected reactive non-blocking responses: " + responses2);
 
+    }
+
+    public static void lookupSubjectsExample() {
+        var url = "localhost:9000";
+
+        /* Make a secure connection with grpc TLS this time */
+        var clientsManager = RelationsGrpcClientsManager.forInsecureClients(url);
+        var lookupClient = clientsManager.getLookupClient();
+
+        var lookupSubjectsRequest = LookupSubjectsRequest.newBuilder().setResource(
+                ObjectReference.newBuilder()
+                        .setType(ObjectType.newBuilder().setName("thing").build())
+                        .setId("resource")
+        ).setRelation("view").setSubjectType(ObjectType.newBuilder().setName("user")).build();
+
+        /*
+         * Blocking
+         */
+
+        var subjectsIterator = lookupClient.lookupSubjects(lookupSubjectsRequest);
+        Iterable<LookupSubjectsResponse> iterable = () -> subjectsIterator;
+
+        var subjects = StreamSupport.stream(iterable.spliterator(), false)
+                .map(LookupSubjectsResponse::getSubject)
+                .collect(Collectors.toList());
+        System.out.println("Blocking lookup subjects: " + subjects);
+
+        /*
+         * Non-blocking reactive style
+         */
+
+        Multi<LookupSubjectsResponse> multi = lookupClient.lookupSubjectsMulti(lookupSubjectsRequest);
+
+        /* Pattern where we may want collect all the responses, but still operate on each as it comes in. */
+        List<LookupSubjectsResponse> responses2 = multi.onItem()
+                .invoke(response -> {
+                    var tuple = response.getSubject();
+                    System.out.println("Reactive non-blocking lookup subjects: " + tuple);
+                })
+                .collect().asList().await().indefinitely();
+
+        System.out.println("Collected reactive non-blocking responses: " + responses2);
     }
 
 }
