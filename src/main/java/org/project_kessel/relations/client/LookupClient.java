@@ -4,9 +4,7 @@ import io.grpc.Channel;
 import io.grpc.stub.StreamObserver;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.operators.multi.processors.UnicastProcessor;
-import org.project_kessel.api.relations.v0.KesselLookupServiceGrpc;
-import org.project_kessel.api.relations.v0.LookupSubjectsRequest;
-import org.project_kessel.api.relations.v0.LookupSubjectsResponse;
+import org.project_kessel.api.relations.v0.*;
 
 import java.util.Iterator;
 import java.util.logging.Logger;
@@ -24,6 +22,40 @@ public class LookupClient {
 
     public void lookupSubjects(LookupSubjectsRequest request, StreamObserver<LookupSubjectsResponse> responseObserver) {
         asyncStub.lookupSubjects(request, responseObserver);
+    }
+
+    public void lookupResources(LookupResourcesRequest request, StreamObserver<LookupResourcesResponse> responseObserver) {
+        asyncStub.lookupResources(request, responseObserver);
+    }
+
+    public Iterator<LookupResourcesResponse> lookupResources(LookupResourcesRequest request) {
+        return blockingStub.lookupResources(request);
+    }
+
+    public Multi<LookupResourcesResponse> lookupResourcesMulti(LookupResourcesRequest request) {
+        final UnicastProcessor<LookupResourcesResponse> responseProcessor = UnicastProcessor.create();
+
+        var streamObserver = new StreamObserver<LookupResourcesResponse>() {
+            @Override
+            public void onNext(LookupResourcesResponse response) {
+                responseProcessor.onNext(response);
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                responseProcessor.onError(t);
+            }
+
+            @Override
+            public void onCompleted() {
+                responseProcessor.onComplete();
+            }
+        };
+
+        var multi = Multi.createFrom().publisher(responseProcessor);
+        lookupResources(request, streamObserver);
+
+        return multi;
     }
 
     public Iterator<LookupSubjectsResponse> lookupSubjects(LookupSubjectsRequest request) {
