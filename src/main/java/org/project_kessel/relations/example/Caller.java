@@ -117,6 +117,7 @@ public class Caller {
 
         getRelationshipsExample();
         lookupSubjectsExample();
+        lookupResourcesExample();
     }
 
     public static void getRelationshipsExample() {
@@ -235,6 +236,46 @@ public class Caller {
                 .invoke(response -> {
                     var tuple = response.getSubject();
                     System.out.println("Reactive non-blocking lookup subjects: " + tuple);
+                })
+                .collect().asList().await().indefinitely();
+
+        System.out.println("Collected reactive non-blocking responses: " + responses2);
+    }
+
+    public static void lookupResourcesExample() {
+        var url = "localhost:9000";
+
+        var clientsManager = RelationsGrpcClientsManager.forInsecureClients(url);
+        var lookupClient = clientsManager.getLookupClient();
+
+        var lookupResourcesRequest = LookupResourcesRequest.newBuilder().
+                setResourceType(ObjectType.newBuilder().setName("thing"))
+              .setRelation("view").setSubject(SubjectReference.newBuilder()
+                .setSubject(ObjectReference.newBuilder()
+                        .setType(ObjectType.newBuilder()
+                                .setName("user").build())
+                        .setId("bob").build())
+                .build()).build();
+
+        var resourceIterator = lookupClient.lookupResources(lookupResourcesRequest);
+        Iterable<LookupResourcesResponse> iterable = () -> resourceIterator;
+
+        var resources = StreamSupport.stream(iterable.spliterator(), false)
+                .map(LookupResourcesResponse::getResource)
+                .collect(Collectors.toList());
+        System.out.println("Blocking lookup resources: " + resources);
+
+        /*
+         * Non-blocking reactive style
+         */
+
+        Multi<LookupResourcesResponse> multi = lookupClient.lookupResourcesMulti(lookupResourcesRequest);
+
+        /* Pattern where we may want collect all the responses, but still operate on each as it comes in. */
+        List<LookupResourcesResponse> responses2 = multi.onItem()
+                .invoke(response -> {
+                    var tuple = response.getResource();
+                    System.out.println("Reactive non-blocking lookup resources: " + tuple);
                 })
                 .collect().asList().await().indefinitely();
 
