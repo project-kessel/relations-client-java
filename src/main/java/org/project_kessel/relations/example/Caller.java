@@ -2,6 +2,10 @@ package org.project_kessel.relations.example;
 
 import org.project_kessel.api.relations.v0.CheckRequest;
 import org.project_kessel.api.relations.v0.CheckResponse;
+import org.project_kessel.api.relations.v1.GetLivezReply;
+import org.project_kessel.api.relations.v1.GetLivezRequest;
+import org.project_kessel.api.relations.v1.GetReadyzReply;
+import org.project_kessel.api.relations.v1.GetReadyzRequest;
 import org.project_kessel.api.relations.v0.*;
 import org.project_kessel.relations.client.RelationsGrpcClientsManager;
 import io.grpc.stub.StreamObserver;
@@ -115,6 +119,8 @@ public class Caller {
                 })
                 .await().indefinitely();
 
+        getLivezExample();
+        getReadyzExample();
         getRelationshipsExample();
         lookupSubjectsExample();
     }
@@ -197,6 +203,169 @@ public class Caller {
 
         System.out.println("Collected reactive non-blocking responses: " + responses2);
 
+    }
+
+    public static void getLivezExample() {
+        var url = "localhost:9000";
+
+        var clientsManager = RelationsGrpcClientsManager.forInsecureClients(url);
+        var healthClient = clientsManager.getHealthClient();
+
+        var getLivezRequest = GetLivezRequest.newBuilder().build();
+        
+        /*
+         * Choice of blocking v async is made by method signature.
+         * - Just GetLivezRequest in args and GetLivezReply returned indicates blocking.
+         * - StreamObserver<GetLivezReply> in args indicates async.
+         */
+
+        /* Blocking */
+        var getLivezResponse = healthClient.livez(getLivezRequest);
+        var permitted = getLivezResponse.getStatus().equals("OK");
+
+        if (permitted) {
+            System.out.println("Blocking: Permitted");
+        } else {
+            System.out.println("Blocking: Denied");
+        }
+
+        /*
+         * Non-blocking
+         */
+        final CountDownLatch conditionLatch = new CountDownLatch(1);
+        var streamObserver = new StreamObserver<GetLivezReply>() {
+             @Override
+             public void onNext(GetLivezReply response) {
+                 /* Because we don't return a stream, but a response object with all the relationships inside,
+                  * we get no benefit from an async/non-blocking call right now. It all returns at once.
+                  */
+                var permitted = getLivezResponse.getStatus().equals("OK");
+
+                if (permitted) {
+                    System.out.println("Blocking: Permitted");
+                } else {
+                    System.out.println("Blocking: Denied");
+                }
+             }
+ 
+             @Override
+             public void onError(Throwable t) {
+                 // TODO:
+             }
+ 
+             @Override
+             public void onCompleted() {
+                 conditionLatch.countDown();
+             }
+         };
+ 
+         healthClient.livez(getLivezRequest, streamObserver);
+ 
+         /* Use a passed-in countdownlatch to wait for the result async on the main thread */
+         try {
+             conditionLatch.await();
+         } catch (InterruptedException e) {
+             throw new RuntimeException(e);
+         }
+ 
+         /*
+          * Non-blocking reactive style
+          */
+ 
+         Uni<GetLivezReply> uni = healthClient.livezUni(getLivezRequest);
+ 
+         /* Pattern where we may want collect all the responses, but still operate on each as it comes in. */
+         GetLivezReply glr = uni.onItem()
+                 .invoke(() -> {
+                     if(permitted) {
+                         System.out.println("Reactive non-blocking: Permitted");
+                     } else {
+                         System.out.println("Reactive non-blocking: Denied");
+                     }
+                 })
+                 .await().indefinitely();
+    }
+
+
+    public static void getReadyzExample() {
+        var url = "localhost:9000";
+
+        var clientsManager = RelationsGrpcClientsManager.forInsecureClients(url);
+        var healthClient = clientsManager.getHealthClient();
+
+        var getReadyzRequest = GetReadyzRequest.newBuilder().build();
+        
+        /*
+         * Choice of blocking v async is made by method signature.
+         * - Just GetReadyzRequest in args and GetReadyzReply returned indicates blocking.
+         * - StreamObserver<GetReadyzReply> in args indicates async.
+         */
+
+        /* Blocking */
+        var getReadyzResponse = healthClient.readyz(getReadyzRequest);
+        var permitted = getReadyzResponse.getStatus().equals("OK");
+
+        if (permitted) {
+            System.out.println("Blocking: Permitted");
+        } else {
+            System.out.println("Blocking: Denied");
+        }
+
+        /*
+         * Non-blocking
+         */
+        final CountDownLatch conditionLatch = new CountDownLatch(1);
+        var streamObserver = new StreamObserver<GetReadyzReply>() {
+             @Override
+             public void onNext(GetReadyzReply response) {
+                 /* Because we don't return a stream, but a response object with all the relationships inside,
+                  * we get no benefit from an async/non-blocking call right now. It all returns at once.
+                  */
+                  var permitted = getReadyzResponse.getStatus().equals("OK");
+
+                  if (permitted) {
+                      System.out.println("Blocking: Permitted");
+                  } else {
+                      System.out.println("Blocking: Denied");
+                  }
+             }
+ 
+             @Override
+             public void onError(Throwable t) {
+                 // TODO:
+             }
+ 
+             @Override
+             public void onCompleted() {
+                 conditionLatch.countDown();
+             }
+         };
+ 
+         healthClient.readyz(getReadyzRequest, streamObserver);
+ 
+         /* Use a passed-in countdownlatch to wait for the result async on the main thread */
+         try {
+             conditionLatch.await();
+         } catch (InterruptedException e) {
+             throw new RuntimeException(e);
+         }
+ 
+         /*
+          * Non-blocking reactive style
+          */
+ 
+         Uni<GetReadyzReply> uni = healthClient.readyzUni(getReadyzRequest);
+ 
+         /* Pattern where we may want collect all the responses, but still operate on each as it comes in. */
+         GetReadyzReply grr = uni.onItem()
+                 .invoke(() -> {
+                     if(permitted) {
+                         System.out.println("Reactive non-blocking: Permitted");
+                     } else {
+                         System.out.println("Reactive non-blocking: Denied");
+                     }
+                 })
+                 .await().indefinitely();
     }
 
     public static void lookupSubjectsExample() {
