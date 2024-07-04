@@ -106,6 +106,21 @@
       <version>4.0.3.Final</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>build.buf.gen</groupId>
+      <artifactId>lennysgarage_test-kessel_grpc_java</artifactId>
+      <version>1.64.0.1.20240703163949.1b7f6d35d73a</version>
+    </dependency>
+    <dependency>
+      <groupId>build.buf.gen</groupId>
+      <artifactId>lennysgarage_test-kessel_protocolbuffers_java</artifactId>
+      <version>25.1.0.1.20240703163949.1b7f6d35d73a</version>
+    </dependency>
+    <dependency>
+      <groupId>build.buf.gen</groupId>
+      <artifactId>lennysgarage_test-kessel_bufbuild_validate-java</artifactId>
+      <version>1.0.4.1.20240703163949.1b7f6d35d73a</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -117,50 +132,6 @@
       </extension>
     </extensions>
     <plugins>
-      <plugin>
-        <groupId>org.xolstice.maven.plugins</groupId>
-        <artifactId>protobuf-maven-plugin</artifactId>
-        <version>0.6.1</version>
-        <configuration>
-          <protocArtifact>com.google.protobuf:protoc:3.25.1:exe:${os.detected.classifier}</protocArtifact>
-          <pluginId>grpc-java</pluginId>
-          <pluginArtifact>io.grpc:protoc-gen-grpc-java:1.64.0:exe:${os.detected.classifier}</pluginArtifact>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>compile</goal>
-              <goal>compile-custom</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>protoc-java-pgv</id>
-            <goals>
-              <goal>compile-custom</goal>
-            </goals>
-            <configuration>
-              <pluginParameter>lang=java</pluginParameter>
-              <pluginId>java-pgv</pluginId>
-              <pluginArtifact>
-                build.buf.protoc-gen-validate:protoc-gen-validate:1.0.4:exe:${os.detected.classifier}
-              </pluginArtifact>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>io.smallrye</groupId>
-        <artifactId>jandex-maven-plugin</artifactId>
-        <version>3.1.8</version>
-        <executions>
-          <execution>
-            <id>make-index</id>
-            <goals>
-              <goal>jandex</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
@@ -234,4 +205,18 @@
       </plugin>
     </plugins>
   </build>
+
+  <repositories>
+    <repository>
+      <name>Buf Maven Repository</name>
+      <id>buf</id>
+      <url>https://buf.build/gen/maven</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
 </project>
