@@ -6,13 +6,13 @@ import static io.grpc.MethodDescriptor.generateFullMethodName;
  */
 @javax.annotation.Generated(
     value = "by gRPC proto compiler (version 1.64.0)",
-    comments = "Source: kessel/health/v1/health.proto")
+    comments = "Source: kessel/relations/v1/health.proto")
 @io.grpc.stub.annotations.GrpcGenerated
 public final class KesselHealthServiceGrpc {
 
   private KesselHealthServiceGrpc() {}
 
-  public static final java.lang.String SERVICE_NAME = "kessel.health.v1.KesselHealthService";
+  public static final java.lang.String SERVICE_NAME = "kessel.relations.v1.KesselHealthService";
 
   // Static method descriptors that strictly reflect the proto.
   private static volatile io.grpc.MethodDescriptor<org.project_kessel.api.relations.v1.GetLivezRequest,
