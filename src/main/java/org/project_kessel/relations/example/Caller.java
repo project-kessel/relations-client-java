@@ -1,6 +1,7 @@
 package org.project_kessel.relations.example;
 
 import build.buf.gen.kessel.relations.v1beta1.*;
+import build.buf.gen.kessel.relations.v1.*;
 import org.project_kessel.relations.client.RelationsGrpcClientsManager;
 import io.grpc.stub.StreamObserver;
 import io.smallrye.mutiny.Multi;
