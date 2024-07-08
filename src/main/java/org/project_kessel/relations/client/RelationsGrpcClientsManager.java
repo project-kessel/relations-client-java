@@ -86,4 +86,8 @@ public class RelationsGrpcClientsManager {
         return new LookupClient(channel);
     }
 
+    public HealthClient getHealthClient() {
+        return new HealthClient(channel);
+    }
+
 }
