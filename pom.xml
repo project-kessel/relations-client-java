@@ -109,17 +109,17 @@
     <dependency>
       <groupId>build.buf.gen</groupId>
       <artifactId>lennysgarage_test-kessel_grpc_java</artifactId>
-      <version>1.64.0.1.20240703163949.1b7f6d35d73a</version>
+      <version>1.64.0.1.20240705133654.a6e848d9ea77</version>
     </dependency>
     <dependency>
       <groupId>build.buf.gen</groupId>
       <artifactId>lennysgarage_test-kessel_protocolbuffers_java</artifactId>
-      <version>25.1.0.1.20240703163949.1b7f6d35d73a</version>
+      <version>25.1.0.1.20240705133654.a6e848d9ea77</version>
     </dependency>
     <dependency>
       <groupId>build.buf.gen</groupId>
       <artifactId>lennysgarage_test-kessel_bufbuild_validate-java</artifactId>
-      <version>1.0.4.1.20240703163949.1b7f6d35d73a</version>
+      <version>1.0.4.1.20240705133654.a6e848d9ea77</version>
     </dependency>
   </dependencies>
 
@@ -145,6 +145,19 @@
             <phase>verify</phase>
             <goals>
               <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>io.smallrye</groupId>
+        <artifactId>jandex-maven-plugin</artifactId>
+        <version>3.1.8</version>
+        <executions>
+          <execution>
+            <id>make-index</id>
+            <goals>
+              <goal>jandex</goal>
             </goals>
           </execution>
         </executions>
