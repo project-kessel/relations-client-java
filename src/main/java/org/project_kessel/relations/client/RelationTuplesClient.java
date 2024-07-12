@@ -1,7 +1,12 @@
 package org.project_kessel.relations.client;
 
-import org.project_kessel.api.relations.v1beta1.*;
-
+import org.project_kessel.api.relations.v1beta1.KesselTupleServiceGrpc;
+import org.project_kessel.api.relations.v1beta1.CreateTuplesRequest;
+import org.project_kessel.api.relations.v1beta1.ReadTuplesRequest;
+import org.project_kessel.api.relations.v1beta1.DeleteTuplesRequest;
+import org.project_kessel.api.relations.v1beta1.CreateTuplesResponse;
+import org.project_kessel.api.relations.v1beta1.ReadTuplesResponse;
+import org.project_kessel.api.relations.v1beta1.DeleteTuplesResponse;
 import io.grpc.Channel;
 import io.grpc.stub.StreamObserver;
 import io.smallrye.mutiny.Multi;
