@@ -4,7 +4,7 @@ import io.grpc.Channel;
 import io.grpc.stub.StreamObserver;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.operators.multi.processors.UnicastProcessor;
-import build.buf.gen.kessel.relations.v1beta1.*;
+import org.project_kessel.api.relations.v1beta1.*;
 
 import java.util.Iterator;
 import java.util.logging.Logger;

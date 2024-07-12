@@ -1,8 +1,6 @@
 package org.project_kessel.relations.client;
 
-import build.buf.gen.kessel.relations.v1beta1.CheckRequest;
-import build.buf.gen.kessel.relations.v1beta1.CheckResponse;
-import build.buf.gen.kessel.relations.v1beta1.KesselCheckServiceGrpc;
+import org.project_kessel.api.relations.v1beta1.*;
 import io.grpc.Channel;
 import io.grpc.stub.StreamObserver;
 import io.smallrye.mutiny.Uni;

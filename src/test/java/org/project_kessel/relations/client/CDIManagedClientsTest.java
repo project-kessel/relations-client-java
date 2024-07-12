@@ -1,6 +1,6 @@
 package org.project_kessel.relations.client;
 
-import build.buf.gen.kessel.relations.v1beta1.*;
+import org.project_kessel.api.relations.v1beta1.*;
 
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
