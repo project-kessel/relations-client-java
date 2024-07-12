@@ -164,7 +164,7 @@
             <executable>buf</executable>
             <arguments>
                 <argument>generate</argument>
-                <argument>buf.build/lennysgarage/test-kessel</argument>
+                <argument>buf.build/project-kessel/relations-api</argument>
             </arguments>
         </configuration>
       </plugin>
