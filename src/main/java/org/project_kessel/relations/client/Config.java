@@ -17,6 +17,7 @@ import java.util.Optional;
 public interface Config {
     @WithDefault("false")
     boolean isSecureClients();
+    
     String targetUrl();
 
     @WithName("authn")

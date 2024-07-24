@@ -23,6 +23,10 @@ public class CheckClient extends KesselClient<KesselCheckServiceGrpc.KesselCheck
         asyncStub.check(request, responseObserver);
     }
 
+    public CheckResponse check(CheckRequest request) {
+        return blockingStub.check(request);
+    }
+
     public Uni<CheckResponse> checkUni(CheckRequest request) {
         final UnicastProcessor<CheckResponse> responseProcessor = UnicastProcessor.create();
 
@@ -47,9 +51,5 @@ public class CheckClient extends KesselClient<KesselCheckServiceGrpc.KesselCheck
         check(request, streamObserver);
 
         return uni;
-    }
-
-    public CheckResponse check(CheckRequest request) {
-        return blockingStub.check(request);
     }
 }

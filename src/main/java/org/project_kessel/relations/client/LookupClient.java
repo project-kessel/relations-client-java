@@ -21,7 +21,12 @@ public class LookupClient extends KesselClient<KesselLookupServiceGrpc.KesselLoo
         asyncStub.lookupSubjects(request, responseObserver);
     }
 
-    public void lookupResources(LookupResourcesRequest request, StreamObserver<LookupResourcesResponse> responseObserver) {
+    public Iterator<LookupSubjectsResponse> lookupSubjects(LookupSubjectsRequest request) {
+        return blockingStub.lookupSubjects(request);
+    }
+
+    public void lookupResources(LookupResourcesRequest request, 
+            StreamObserver<LookupResourcesResponse> responseObserver) {
         asyncStub.lookupResources(request, responseObserver);
     }
 
@@ -53,10 +58,6 @@ public class LookupClient extends KesselClient<KesselLookupServiceGrpc.KesselLoo
         lookupResources(request, streamObserver);
 
         return multi;
-    }
-
-    public Iterator<LookupSubjectsResponse> lookupSubjects(LookupSubjectsRequest request) {
-        return blockingStub.lookupSubjects(request);
     }
 
     public Multi<LookupSubjectsResponse> lookupSubjectsMulti(LookupSubjectsRequest request) {

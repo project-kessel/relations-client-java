@@ -29,6 +29,12 @@ public class RelationTuplesClient extends KesselClient<KesselTupleServiceGrpc.Ke
 
     /**
      */
+    public CreateTuplesResponse createTuples(CreateTuplesRequest request) {
+        return blockingStub.createTuples(request);
+    }
+
+    /**
+     */
     public void readTuples(ReadTuplesRequest request,
                            StreamObserver<ReadTuplesResponse> responseObserver) {
         asyncStub.readTuples(request, responseObserver);
@@ -36,21 +42,15 @@ public class RelationTuplesClient extends KesselClient<KesselTupleServiceGrpc.Ke
 
     /**
      */
+    public Iterator<ReadTuplesResponse> readTuples(ReadTuplesRequest request) {
+        return blockingStub.readTuples(request);
+    }
+
+    /**
+     */
     public void deleteTuples(DeleteTuplesRequest request,
                              StreamObserver<DeleteTuplesResponse> responseObserver) {
         asyncStub.deleteTuples(request, responseObserver);
-    }
-
-    /**
-     */
-    public CreateTuplesResponse createTuples(CreateTuplesRequest request) {
-        return blockingStub.createTuples(request);
-    }
-
-    /**
-     */
-    public Iterator<ReadTuplesResponse> readTuples(ReadTuplesRequest request) {
-        return blockingStub.readTuples(request);
     }
 
     /**

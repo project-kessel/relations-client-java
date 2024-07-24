@@ -50,7 +50,7 @@ public class Caller {
         var checkResponse = checkClient.check(checkRequest);
         var permitted = checkResponse.getAllowed() == CheckResponse.Allowed.ALLOWED_TRUE;
 
-        if(permitted) {
+        if (permitted) {
             System.out.println("Blocking: Permitted");
         } else {
             System.out.println("Blocking: Denied");
@@ -69,7 +69,7 @@ public class Caller {
                  */
                 var permitted = response.getAllowed() == CheckResponse.Allowed.ALLOWED_TRUE;
 
-                if(permitted) {
+                if (permitted) {
                     System.out.println("Non-blocking: Permitted");
                 } else {
                     System.out.println("Non-blocking: Denied");
@@ -105,7 +105,7 @@ public class Caller {
         /* Pattern where we may want collect all the responses, but still operate on each as it comes in. */
         CheckResponse cr = uni.onItem()
                 .invoke(() -> {
-                    if(permitted) {
+                    if (permitted) {
                         System.out.println("Reactive non-blocking: Permitted");
                     } else {
                         System.out.println("Reactive non-blocking: Denied");
@@ -246,10 +246,10 @@ public class Caller {
         var clientsManager = RelationsGrpcClientsManager.forInsecureClients(url);
         var lookupClient = clientsManager.getLookupClient();
 
-        var lookupResourcesRequest = LookupResourcesRequest.newBuilder().
-                setResourceType(ObjectType.newBuilder().setName("thing"))
-              .setRelation("view").setSubject(SubjectReference.newBuilder()
-                .setSubject(ObjectReference.newBuilder()
+        var lookupResourcesRequest = LookupResourcesRequest.newBuilder()
+                .setResourceType(ObjectType.newBuilder().setName("thing"))
+                .setRelation("view").setSubject(SubjectReference.newBuilder()
+                  .setSubject(ObjectReference.newBuilder()
                         .setType(ObjectType.newBuilder()
                                 .setName("user").build())
                         .setId("bob").build())
