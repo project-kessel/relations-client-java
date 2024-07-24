@@ -56,7 +56,7 @@ public class OIDCClientCredentialsCallCredentials extends io.grpc.CallCredential
     }
 
     /**
-     * For
+     * For unusual cases where stored credentials (i.e. token), which may be long-lived, is bad and needs to be flushed.
      */
     public void flushStoredCredentials() {
         synchronized (storedBearerHeaderRef) {

@@ -16,7 +16,7 @@ public abstract class OIDCClientCredentialsMinter {
 
     public static OIDCClientCredentialsMinter forClass(Class<?> minterClass) throws OIDCClientCredentialsMinterException {
         try {
-            Constructor<?> constructor  = defaultMinter.getConstructor();
+            Constructor<?> constructor  = minterClass.getConstructor();
             return (OIDCClientCredentialsMinter)constructor.newInstance();
         } catch (InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException e) {
             throw new OIDCClientCredentialsMinterException("Can't create instance of OIDC client credentials minter", e);
