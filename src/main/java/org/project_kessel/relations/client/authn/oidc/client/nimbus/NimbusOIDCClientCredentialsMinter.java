@@ -25,8 +25,7 @@ import java.util.Optional;
 @RegisterForReflection
 public class NimbusOIDCClientCredentialsMinter extends OIDCClientCredentialsMinter {
     @Override
-    public BearerHeader authenticateAndRetrieveAuthorizationHeader(Config.OIDCClientCredentialsConfig authnConfig) throws OIDCClientCredentialsMinterException {
-        var config = (Config.OIDCClientCredentialsConfig) authnConfig;
+    public BearerHeader authenticateAndRetrieveAuthorizationHeader(Config.OIDCClientCredentialsConfig config) throws OIDCClientCredentialsMinterException {
         Issuer issuer = new Issuer(config.issuer());
         ClientID clientID = new ClientID(config.clientId());
         Secret clientSecret = new Secret(config.clientSecret());

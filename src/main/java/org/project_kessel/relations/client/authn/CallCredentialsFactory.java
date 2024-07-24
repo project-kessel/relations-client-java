@@ -6,6 +6,10 @@ import org.project_kessel.relations.client.authn.oidc.client.OIDCClientCredentia
 
 public class CallCredentialsFactory {
 
+    private CallCredentialsFactory() {
+
+    }
+
     public static CallCredentials create(Config.AuthenticationConfig authnConfig) throws CallCredentialsCreationException {
         if (authnConfig == null) {
             throw new CallCredentialsCreationException("AuthenticationConfig is required to create CallCredentials and must not be null.");
@@ -13,10 +17,8 @@ public class CallCredentialsFactory {
 
         try {
             switch (authnConfig.mode()) {
-                case DISABLED:
-                    return null;
-                case OIDC_CLIENT_CREDENTIALS:
-                    return new OIDCClientCredentialsCallCredentials(authnConfig);
+                case DISABLED: return null;
+                case OIDC_CLIENT_CREDENTIALS: return new OIDCClientCredentialsCallCredentials(authnConfig);
             }
         } catch (OIDCClientCredentialsCallCredentials.OIDCClientCredentialsCallCredentialsException e) {
             throw new CallCredentialsCreationException("Failed to create OIDCClientCredentialsCallCredentials.", e);

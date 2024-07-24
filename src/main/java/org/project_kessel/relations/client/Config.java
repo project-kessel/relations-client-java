@@ -40,6 +40,6 @@ public interface Config {
         @WithName("secret")
         String clientSecret();
         Optional<String[]> scope();
-        Optional<String> OIDCClientCredentialsMinterImplementation();
+        Optional<String> oidcClientCredentialsMinterImplementation();
     }
 }

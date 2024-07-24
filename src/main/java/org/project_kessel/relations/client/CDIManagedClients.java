@@ -17,10 +17,6 @@ public class CDIManagedClients {
         var targetUrl = config.targetUrl();
         var authnEnabled = config.authenticationConfig().map(t -> !t.mode().equals(Config.AuthMode.DISABLED)).orElse(false);
 
-        if(authnEnabled && config.authenticationConfig().isEmpty()) {
-            throw new RuntimeException("Authentication mode enabled but no authentication config provided.");
-        }
-
         if (isSecureClients) {
             if(authnEnabled) {
                 return RelationsGrpcClientsManager.forSecureClients(targetUrl, config.authenticationConfig().get());

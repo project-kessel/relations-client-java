@@ -16,22 +16,22 @@ import java.util.concurrent.Executors;
 import static io.smallrye.common.constraint.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class RelationsGrpcClientsManagerTest {
+class RelationsGrpcClientsManagerTest {
 
     @BeforeAll
-    public static void testSetup() {
+    static void testSetup() {
         /* Make sure all client managers shutdown/removed before tests */
         RelationsGrpcClientsManager.shutdownAll();
     }
 
     @AfterEach
-    public void testTeardown() {
+    void testTeardown() {
         /* Make sure all client managers shutdown/removed after each test */
         RelationsGrpcClientsManager.shutdownAll();
     }
 
     @Test
-    public void testManagerReusePatterns() {
+    void testManagerReusePatterns() {
         var one = RelationsGrpcClientsManager.forInsecureClients("localhost:8080");
         var two = RelationsGrpcClientsManager.forInsecureClients("localhost:8080"); // same as one
         var three = RelationsGrpcClientsManager.forInsecureClients("localhost1:8080");
@@ -52,7 +52,7 @@ public class RelationsGrpcClientsManagerTest {
     }
 
     @Test
-    public void testThreadingChaos() {
+    void testThreadingChaos() {
         /* Basic testing to ensure that we don't get ConcurrentModificationExceptions, or any other exceptions, when
          * creating and destroying managers on different threads. */
 
@@ -116,7 +116,7 @@ public class RelationsGrpcClientsManagerTest {
     }
 
     @Test
-    public void testManagerReuseInternal() throws Exception {
+    void testManagerReuseInternal() throws Exception {
         RelationsGrpcClientsManager.forInsecureClients("localhost:8080");
         RelationsGrpcClientsManager.forInsecureClients("localhost:8080"); // same as one
         RelationsGrpcClientsManager.forInsecureClients("localhost1:8080");
@@ -136,7 +136,7 @@ public class RelationsGrpcClientsManagerTest {
     }
 
     @Test
-    public void testSameChannelUsedByClientsInternal() throws Exception {
+    void testSameChannelUsedByClientsInternal() throws Exception {
         var manager = RelationsGrpcClientsManager.forInsecureClients("localhost:8080");
         var checkClient = manager.getCheckClient();
         var relationTuplesClient = manager.getRelationTuplesClient();
@@ -157,7 +157,7 @@ public class RelationsGrpcClientsManagerTest {
     }
 
     @Test
-    public void testCreateAndShutdownPatternsInternal() throws Exception {
+    void testCreateAndShutdownPatternsInternal() throws Exception {
         var insecureField = RelationsGrpcClientsManager.class.getDeclaredField("insecureManagers");
         insecureField.setAccessible(true);
         var insecureManagersSize = ((HashMap<?,?>)insecureField.get(null)).size();

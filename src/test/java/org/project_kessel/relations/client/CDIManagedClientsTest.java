@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Use Weld as a test container to check CDI functionality.
  */
 @EnableWeld
-public class CDIManagedClientsTest {
+class CDIManagedClientsTest {
     @WeldSetup
     public WeldInitiator weld = WeldInitiator.from(new Weld().setBeanDiscoveryMode(BeanDiscoveryMode.ALL).addBeanClass(TestConfig.class)).build();
 
@@ -92,7 +92,7 @@ public class CDIManagedClientsTest {
     }
 
     @Test
-    public void basicCDIWiringTest() {
+    void basicCDIWiringTest() {
         /* Make some calls to dummy services in test grpc server to test injected clients */
         var checkResponse = checkClient.check(CheckRequest.getDefaultInstance());
         var relationTuplesResponse = relationTuplesClient.readTuples(ReadTuplesRequest.getDefaultInstance());

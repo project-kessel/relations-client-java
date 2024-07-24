@@ -8,8 +8,6 @@ import java.util.Optional;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.project_kessel.relations.client.authn.oidc.client.OIDCClientCredentialsMinter.forName;
-
 public class OIDCClientCredentialsCallCredentials extends io.grpc.CallCredentials {
     private static final Metadata.Key<String> authorizationKey = Metadata.Key.of("Authorization", Metadata.ASCII_STRING_MARSHALLER);
 
@@ -24,7 +22,7 @@ public class OIDCClientCredentialsCallCredentials extends io.grpc.CallCredential
         }
         this.clientCredentialsConfig = authnConfig.clientCredentialsConfig().get();
 
-        Optional<String> minterImpl = clientCredentialsConfig.OIDCClientCredentialsMinterImplementation();
+        Optional<String> minterImpl = clientCredentialsConfig.oidcClientCredentialsMinterImplementation();
         try {
             if(minterImpl.isPresent()) {
                 this.minter = OIDCClientCredentialsMinter.forName(minterImpl.get());
@@ -49,7 +47,7 @@ public class OIDCClientCredentialsCallCredentials extends io.grpc.CallCredential
                     headers.put(authorizationKey, storedBearerHeaderRef.get().getAuthorizationHeader());
                     applier.apply(headers);
                 }
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 applier.fail(Status.UNAUTHENTICATED.withCause(e));
             }
         });
