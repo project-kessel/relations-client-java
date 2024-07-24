@@ -1,7 +1,7 @@
 package org.project_kessel.relations.client;
 
 import io.grpc.*;
-import org.project_kessel.relations.client.authn.oidc.client.OIDCClientCredentialsCallCredentials;
+import org.project_kessel.relations.client.authn.CallCredentialsFactory;
 
 import java.util.HashMap;
 
@@ -22,12 +22,11 @@ public class RelationsGrpcClientsManager {
     public static synchronized RelationsGrpcClientsManager forInsecureClients(String targetUrl, Config.AuthenticationConfig authnConfig) throws RuntimeException {
         if (!insecureManagers.containsKey(targetUrl)) {
             try {
-                // For now, the only client authn scheme supported is OIDC client credentials
                 var manager = new RelationsGrpcClientsManager(targetUrl,
                         InsecureChannelCredentials.create(),
-                        new OIDCClientCredentialsCallCredentials(authnConfig));
+                        CallCredentialsFactory.create(authnConfig));
                 insecureManagers.put(targetUrl, manager);
-            } catch (OIDCClientCredentialsCallCredentials.OIDCClientCredentialsCallCredentialsException e) {
+            } catch (CallCredentialsFactory.CallCredentialsCreationException e) {
                 throw new RuntimeException(e);
             }
         }
@@ -47,12 +46,11 @@ public class RelationsGrpcClientsManager {
         if (!secureManagers.containsKey(targetUrl)) {
             var tlsChannelCredentials = TlsChannelCredentials.create();
             try {
-                // For now, the only client authn scheme supported is OIDC client credentials
                 var manager = new RelationsGrpcClientsManager(targetUrl,
                         tlsChannelCredentials,
-                        new OIDCClientCredentialsCallCredentials(authnConfig));
+                        CallCredentialsFactory.create(authnConfig));
                 secureManagers.put(targetUrl, manager);
-            } catch (OIDCClientCredentialsCallCredentials.OIDCClientCredentialsCallCredentialsException e) {
+            } catch (CallCredentialsFactory.CallCredentialsCreationException e) {
                 throw new RuntimeException(e);
             }
         }
