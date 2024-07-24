@@ -15,6 +15,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -114,6 +115,11 @@ public class CDIManagedClientsTest {
         @Override
         public String targetUrl() {
             return "0.0.0.0:" + String.valueOf(testServerPort);
+        }
+
+        @Override
+        public Optional<AuthenticationConfig> authenticationConfig() {
+            return Optional.empty();
         }
     }
 }

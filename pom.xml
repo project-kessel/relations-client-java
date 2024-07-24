@@ -87,6 +87,20 @@
       <artifactId>pgv-java-stub</artifactId>
       <version>1.0.4</version>
     </dependency>
+    <!-- Default OIDC implementation. Must be provided by the user. -->
+    <dependency>
+      <groupId>com.nimbusds</groupId>
+      <artifactId>oauth2-oidc-sdk</artifactId>
+      <version>11.13</version>
+      <scope>provided</scope>
+    </dependency>
+    <!-- Included only for @RegisterForReflection to support native Quarkus apps if applicable -->
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-core</artifactId>
+      <version>3.12.3</version>
+      <scope>provided</scope>
+    </dependency>
     <dependency> <!-- necessary for Java 9+ -->
       <groupId>org.apache.tomcat</groupId>
       <artifactId>annotations-api</artifactId>
