@@ -4,8 +4,11 @@ import io.grpc.Channel;
 import io.grpc.stub.StreamObserver;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.operators.multi.processors.UnicastProcessor;
-import org.project_kessel.api.relations.v1beta1.*;
-
+import org.project_kessel.api.relations.v1beta1.KesselLookupServiceGrpc;
+import org.project_kessel.api.relations.v1beta1.LookupSubjectsRequest;
+import org.project_kessel.api.relations.v1beta1.LookupSubjectsResponse;
+import org.project_kessel.api.relations.v1beta1.LookupResourcesRequest;
+import org.project_kessel.api.relations.v1beta1.LookupResourcesResponse;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
@@ -24,7 +27,12 @@ public class LookupClient {
         asyncStub.lookupSubjects(request, responseObserver);
     }
 
-    public void lookupResources(LookupResourcesRequest request, StreamObserver<LookupResourcesResponse> responseObserver) {
+    public Iterator<LookupSubjectsResponse> lookupSubjects(LookupSubjectsRequest request) {
+        return blockingStub.lookupSubjects(request);
+    }
+
+    public void lookupResources(LookupResourcesRequest request, 
+            StreamObserver<LookupResourcesResponse> responseObserver) {
         asyncStub.lookupResources(request, responseObserver);
     }
 
@@ -56,10 +64,6 @@ public class LookupClient {
         lookupResources(request, streamObserver);
 
         return multi;
-    }
-
-    public Iterator<LookupSubjectsResponse> lookupSubjects(LookupSubjectsRequest request) {
-        return blockingStub.lookupSubjects(request);
     }
 
     public Multi<LookupSubjectsResponse> lookupSubjectsMulti(LookupSubjectsRequest request) {

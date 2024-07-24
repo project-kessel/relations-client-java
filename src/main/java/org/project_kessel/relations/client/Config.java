@@ -21,6 +21,7 @@ public interface Config {
 
     @WithDefault("false")
     boolean isSecureClients();
+    
     String targetUrl();
 
     @WithName("authn")

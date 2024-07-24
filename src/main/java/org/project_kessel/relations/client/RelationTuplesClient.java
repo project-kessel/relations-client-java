@@ -11,7 +11,6 @@ import io.grpc.Channel;
 import io.grpc.stub.StreamObserver;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.operators.multi.processors.UnicastProcessor;
-
 import java.util.Iterator;
 
 public class RelationTuplesClient {
@@ -32,6 +31,12 @@ public class RelationTuplesClient {
 
     /**
      */
+    public CreateTuplesResponse createTuples(CreateTuplesRequest request) {
+        return blockingStub.createTuples(request);
+    }
+
+    /**
+     */
     public void readTuples(ReadTuplesRequest request,
                            StreamObserver<ReadTuplesResponse> responseObserver) {
         asyncStub.readTuples(request, responseObserver);
@@ -39,21 +44,15 @@ public class RelationTuplesClient {
 
     /**
      */
+    public Iterator<ReadTuplesResponse> readTuples(ReadTuplesRequest request) {
+        return blockingStub.readTuples(request);
+    }
+
+    /**
+     */
     public void deleteTuples(DeleteTuplesRequest request,
                              StreamObserver<DeleteTuplesResponse> responseObserver) {
         asyncStub.deleteTuples(request, responseObserver);
-    }
-
-    /**
-     */
-    public CreateTuplesResponse createTuples(CreateTuplesRequest request) {
-        return blockingStub.createTuples(request);
-    }
-
-    /**
-     */
-    public Iterator<ReadTuplesResponse> readTuples(ReadTuplesRequest request) {
-        return blockingStub.readTuples(request);
     }
 
     /**

@@ -1,8 +1,10 @@
 package org.project_kessel.relations.client;
 
-import io.grpc.*;
-import org.project_kessel.relations.client.authn.CallCredentialsFactory;
-
+import io.grpc.Grpc;
+import io.grpc.TlsChannelCredentials;
+import io.grpc.ChannelCredentials;
+import io.grpc.ManagedChannel;
+import io.grpc.InsecureChannelCredentials;
 import java.util.HashMap;
 
 public class RelationsGrpcClientsManager {
@@ -72,7 +74,7 @@ public class RelationsGrpcClientsManager {
         var iter = insecureManagers.entrySet().iterator();
         while (iter.hasNext()) {
             var entry = iter.next();
-            if(entry.getValue().channel == managerToShutdown.channel) {
+            if (entry.getValue().channel == managerToShutdown.channel) {
                 entry.getValue().closeClientChannel();
                 iter.remove();
                 return;
@@ -81,7 +83,7 @@ public class RelationsGrpcClientsManager {
         iter = secureManagers.entrySet().iterator();
         while (iter.hasNext()) {
             var entry = iter.next();
-            if(entry.getValue().channel == managerToShutdown.channel) {
+            if (entry.getValue().channel == managerToShutdown.channel) {
                 entry.getValue().closeClientChannel();
                 iter.remove();
                 return;
