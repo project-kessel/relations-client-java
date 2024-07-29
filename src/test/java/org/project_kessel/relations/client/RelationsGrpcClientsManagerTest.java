@@ -39,7 +39,7 @@ public class RelationsGrpcClientsManagerTest {
         var five = RelationsGrpcClientsManager.forSecureClients("localhost1:8080");
         var six = RelationsGrpcClientsManager.forSecureClients("localhost1:8080"); // same as five
 
-        assertNull(one);
+        assertNotNull(one);
         assertNotNull(two);
         assertNotNull(three);
         assertNotNull(four);
