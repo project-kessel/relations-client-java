@@ -29,6 +29,8 @@ class RelationsGrpcClientsManagerTest {
     static void testSetup() {
         /* Make sure all client managers shutdown/removed before tests */
         RelationsGrpcClientsManager.shutdownAll();
+        /* Add self-signed cert to keystore, trust manager and SSL context for TLS testing. */
+        addTestCACertToTrustStore();
     }
 
     @AfterEach
@@ -39,7 +41,8 @@ class RelationsGrpcClientsManagerTest {
 
     @AfterAll
     static void removeTestSetup() {
-
+        /* Remove self-signed cert */
+        removeTestCACertFromKeystore();
     }
 
     @Test
@@ -129,9 +132,6 @@ class RelationsGrpcClientsManagerTest {
 
     @Test
     void testManagersHoldIntendedCredentialsInChannel() throws Exception {
-        /* Add self-signed cert to keystore, trust manager and SSL context for TLS testing. */
-        //addTestCACertToTrustStore();
-
         Config.AuthenticationConfig authnConfig = dummyNonDisabledAuthenticationConfig();
         var manager = RelationsGrpcClientsManager.forInsecureClients("localhost:7000");
         var manager2 = RelationsGrpcClientsManager.forInsecureClients("localhost:7001", authnConfig);
@@ -159,9 +159,6 @@ class RelationsGrpcClientsManagerTest {
 
         assertNotNull(cd4.getMetadata().get(authorizationKey));
         assertEquals("PRIVACY_AND_INTEGRITY", cd4.getCall().getSecurityLevel().toString());
-
-        /* Remove self-signed cert */
-        removeTestCACertFromKeystore();
     }
 
     @Test
