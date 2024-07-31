@@ -130,7 +130,7 @@ class RelationsGrpcClientsManagerTest {
     @Test
     void testManagersHoldIntendedCredentialsInChannel() throws Exception {
         /* Add self-signed cert to keystore, trust manager and SSL context for TLS testing. */
-        addTestCACertToTrustStore();
+        //addTestCACertToTrustStore();
 
         Config.AuthenticationConfig authnConfig = dummyNonDisabledAuthenticationConfig();
         var manager = RelationsGrpcClientsManager.forInsecureClients("localhost:7000");
