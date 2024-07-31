@@ -20,20 +20,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Set up JDK 17
+    - name: Set up Zulu JDK 21
       uses: actions/setup-java@v4
       with:
         java-version: '21'
         distribution: 'zulu'
         cache: maven
-    - name: testing
-      run: ls -R ${{ github.workspace }}
-    - name: testing2
-      run: ls -R ${{ github.RUNNER_TEMP }}
-    - name: testing3
-      run: ls -R ${{ github.GITHUB_ACTION_PATH }}
-    - name: testing4
-      run: ls -R ${{ steps.java.outputs.path }}
     - name: execute a keytool import function
       shell: bash
       env:
