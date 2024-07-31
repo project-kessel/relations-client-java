@@ -31,6 +31,8 @@ jobs:
       run: ls -R ${{ github.RUNNER_TEMP }}
     - name: testing3
       run: ls -R ${{ github.GITHUB_ACTION_PATH }}
+    - name: testing4
+      run: ls -R ${{ steps.java.outputs.path }}
     - name: execute a keytool import function
       shell: bash
       env:
