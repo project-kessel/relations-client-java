@@ -25,5 +25,8 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
+    - name: execute a keytool import function
+      shell: bash
+      run: keytool -import -noprompt -trustcacerts -alias selfsigned -file ${{ github.workspace }}/src/test/resources/certs/test.crt -keystore ${{ steps.java.outputs.path }}/lib/security/cacerts -storepass {{ secrets.KEYSTORE_PASS }}
     - name: Build and test with Maven
       run: ./mvnw -B package --file pom.xml
