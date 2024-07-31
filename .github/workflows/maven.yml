@@ -27,6 +27,10 @@ jobs:
         cache: maven
     - name: testing
       run: ls -R ${{ github.workspace }}
+    - name: testing2
+      run: ls -R ${{ github.RUNNER_TEMP }}
+    - name: testing3
+      run: ls -R ${{ github.GITHUB_ACTION_PATH }}
     - name: execute a keytool import function
       shell: bash
       env:
