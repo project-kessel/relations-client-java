@@ -1,9 +1,5 @@
 package org.project_kessel.relations.client.util;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.X509TrustManager;
 import java.io.*;
 import java.security.*;
 import java.security.cert.Certificate;
@@ -40,40 +36,10 @@ public class CertUtil {
             OutputStream out = new FileOutputStream(file);
             keystore.store(out, passphrase);
             out.close();
-
-            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-            tmf.init(keystore);
-            TrustManager[] trustManagers = tmf.getTrustManagers();
-
-            SSLContext sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(null, trustManagers, null);
-
-            SSLContext.setDefault(sslContext);
         } catch (NoSuchAlgorithmException | CertificateException | KeyStoreException | IOException |
-                 NullPointerException | KeyManagementException e) {
+                 NullPointerException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public static void dumpCerts() {
-        try {
-            TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-            trustManagerFactory.init((KeyStore) null);
-            TrustManager[] trustManagers = trustManagerFactory.getTrustManagers();
-
-            X509TrustManager manager = (X509TrustManager) trustManagers[0];
-
-            for (java.security.cert.X509Certificate x509Certificate : manager.getAcceptedIssuers()) {
-                if ((x509Certificate.getSubjectDN().getName().startsWith("EMAILADDRESS=test@localhost"))) {
-                    System.out.println("\n\n>>>>>> " + x509Certificate.getSubjectX500Principal() + "\n\n");
-                } else {
-                    System.out.println(x509Certificate.getSubjectX500Principal());
-                }
-            }
-        } catch (NoSuchAlgorithmException | KeyStoreException e) {
-            throw new RuntimeException(e);
-        }
-
     }
 
     public static void removeTestCACertFromKeystore() {
@@ -88,17 +54,7 @@ public class CertUtil {
             OutputStream out = new FileOutputStream(file);
             keystore.store(out, passphrase);
             out.close();
-
-            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-            tmf.init(keystore);
-            TrustManager[] trustManagers = tmf.getTrustManagers();
-
-            SSLContext sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(null, trustManagers, null);
-
-            SSLContext.setDefault(sslContext);
-        } catch (KeyStoreException | CertificateException | IOException | NoSuchAlgorithmException |
-                 KeyManagementException e) {
+        } catch (KeyStoreException | CertificateException | IOException | NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
     }
