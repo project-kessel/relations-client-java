@@ -25,10 +25,10 @@ jobs:
         java-version: '21'
         distribution: 'zulu'
         cache: maven
-    - name: execute a keytool import function
-      shell: bash
-      env:
-        KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASS }}
+#    - name: execute a keytool import function
+#      shell: bash
+#      env:
+#        KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASS }}
       run: keytool -import -noprompt -trustcacerts -alias selfsigned -file ${{ github.workspace }}/src/test/resources/certs/test.crt -keystore "$JAVA_HOME/lib/security/cacerts" -storepass "$KEYSTORE_PASS"
     - name: Build and test with Maven
       run: ./mvnw -B package --file pom.xml
