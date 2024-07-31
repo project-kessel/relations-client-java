@@ -127,7 +127,7 @@ class RelationsGrpcClientsManagerTest {
         }
     }
 
-    // TODO: This test will not run github actions as is because keystore is read onlu @Test
+    @Test
     void testManagersHoldIntendedCredentialsInChannel() throws Exception {
         /* Add self-signed cert to keystore, trust manager and SSL context for TLS testing. */
         addTestCACertToTrustStore();
