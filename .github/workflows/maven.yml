@@ -25,6 +25,8 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
+    - name: testing
+      run: ls -R ${{ github.workspace }}
     - name: execute a keytool import function
       shell: bash
       env:
