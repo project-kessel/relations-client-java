@@ -74,6 +74,10 @@ public abstract class OIDCClientCredentialsMinter {
         return expiryTime;
     }
 
+    public static Class<?> getDefaultMinterImplementation() {
+        return defaultMinter;
+    }
+
     public static class OIDCClientCredentialsMinterException extends Exception {
         public OIDCClientCredentialsMinterException(String message) {
             super(message);

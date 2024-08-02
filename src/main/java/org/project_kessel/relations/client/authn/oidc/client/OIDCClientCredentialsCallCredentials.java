@@ -9,7 +9,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class OIDCClientCredentialsCallCredentials extends io.grpc.CallCredentials {
-    private static final Metadata.Key<String> authorizationKey = Metadata.Key.of("Authorization", Metadata.ASCII_STRING_MARSHALLER);
+    static final Metadata.Key<String> authorizationKey = Metadata.Key.of("Authorization", Metadata.ASCII_STRING_MARSHALLER);
 
     private final Config.OIDCClientCredentialsConfig clientCredentialsConfig;
     private final OIDCClientCredentialsMinter minter;
@@ -17,10 +17,7 @@ public class OIDCClientCredentialsCallCredentials extends io.grpc.CallCredential
     private final AtomicReference<OIDCClientCredentialsMinter.BearerHeader> storedBearerHeaderRef = new AtomicReference<>();
 
     public OIDCClientCredentialsCallCredentials(Config.AuthenticationConfig authnConfig) throws OIDCClientCredentialsCallCredentialsException {
-        if(authnConfig.clientCredentialsConfig().isEmpty()) {
-            throw new OIDCClientCredentialsCallCredentialsException("ClientCredentialsConfig is required for OIDC client credentials authentication method.");
-        }
-        this.clientCredentialsConfig = authnConfig.clientCredentialsConfig().get();
+        this.clientCredentialsConfig = validateAndExtractConfig(authnConfig);
 
         Optional<String> minterImpl = clientCredentialsConfig.oidcClientCredentialsMinterImplementation();
         try {
@@ -32,6 +29,11 @@ public class OIDCClientCredentialsCallCredentials extends io.grpc.CallCredential
         } catch (OIDCClientCredentialsMinter.OIDCClientCredentialsMinterException e) {
             throw new OIDCClientCredentialsCallCredentialsException("Couldn't create GrpcCallCredentials because minter impl not instantiated.", e);
         }
+    }
+
+    OIDCClientCredentialsCallCredentials(Config.OIDCClientCredentialsConfig clientCredentialsConfig, OIDCClientCredentialsMinter minter) {
+        this.clientCredentialsConfig = clientCredentialsConfig;
+        this.minter = minter;
     }
 
     @Override
@@ -60,6 +62,24 @@ public class OIDCClientCredentialsCallCredentials extends io.grpc.CallCredential
         synchronized (storedBearerHeaderRef) {
             storedBearerHeaderRef.set(null);
         }
+    }
+
+    /* We don't know that smallrye config validation will be used by clients, so do some validation here. */
+    static Config.OIDCClientCredentialsConfig validateAndExtractConfig(Config.AuthenticationConfig authnConfig) throws OIDCClientCredentialsCallCredentialsException {
+        if (authnConfig.clientCredentialsConfig().isEmpty()) {
+            throw new OIDCClientCredentialsCallCredentialsException("ClientCredentialsConfig is required for OIDC client credentials authentication method.");
+        }
+        if(authnConfig.clientCredentialsConfig().get().issuer() == null) {
+            throw new OIDCClientCredentialsCallCredentialsException("ClientCredentialsConfig Issuer must not be null.");
+        }
+        if(authnConfig.clientCredentialsConfig().get().clientId() == null) {
+            throw new OIDCClientCredentialsCallCredentialsException("ClientCredentialsConfig Client id must not be null.");
+        }
+        if(authnConfig.clientCredentialsConfig().get().clientSecret() == null) {
+            throw new OIDCClientCredentialsCallCredentialsException("ClientCredentialsConfig Client secret must not be null.");
+        }
+
+        return authnConfig.clientCredentialsConfig().get();
     }
 
     public static class OIDCClientCredentialsCallCredentialsException extends Exception {

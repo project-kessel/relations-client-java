@@ -14,10 +14,16 @@ import java.net.InetSocketAddress;
  */
 public class FakeIdp {
     private final int port;
+    private final boolean alwaysSucceedOrFailAuthn;
     HttpServer server = null;
 
     public FakeIdp(int port) {
+        this(port, true);
+    }
+
+    public FakeIdp(int port, boolean alwaysSucceedOrFailAuthn) {
         this.port = port;
+        this.alwaysSucceedOrFailAuthn = alwaysSucceedOrFailAuthn;
     }
 
     public void start() {
@@ -27,7 +33,12 @@ public class FakeIdp {
             throw new RuntimeException(e);
         }
         server.createContext("/.well-known/openid-configuration", new WellKnownHandler());
-        server.createContext("/token", new TokenHandler());
+        if(alwaysSucceedOrFailAuthn) {
+            server.createContext("/token", new TokenHandler());
+        } else {
+            server.createContext("/token", new UnauthorizedHandler());
+        }
+
         server.setExecutor(null); // creates a default executor
         server.start();
     }
@@ -51,6 +62,20 @@ public class FakeIdp {
                     "}";
             t.getResponseHeaders().set("Content-Type", "application/json; charset=UTF-8");
             t.sendResponseHeaders(200, response.length());
+            OutputStream os = t.getResponseBody();
+            os.write(response.getBytes());
+            os.close();
+        }
+    }
+
+    static class UnauthorizedHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange t) throws IOException {
+            String response = "{\"error_description\":\"Access denied by resource owner or authorization server\",\"error\":\"access_denied\"}";
+
+            // https://openid.net/specs/openid-connect-core-1_0.html#TokenEndpoint (3.1.3.4. Token Error Response)
+            t.getResponseHeaders().set("Content-Type", "application/json; charset=UTF-8");
+            t.sendResponseHeaders(400, response.length());
             OutputStream os = t.getResponseBody();
             os.write(response.getBytes());
             os.close();

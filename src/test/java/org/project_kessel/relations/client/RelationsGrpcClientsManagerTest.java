@@ -22,7 +22,7 @@ import static io.smallrye.common.constraint.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.project_kessel.relations.client.util.CertUtil.*;
 
-class RelationsGrpcClientsManagerTest {
+public class RelationsGrpcClientsManagerTest {
     private static final Metadata.Key<String> authorizationKey = Metadata.Key.of("Authorization", Metadata.ASCII_STRING_MARSHALLER);
 
     @BeforeAll
@@ -130,6 +130,10 @@ class RelationsGrpcClientsManagerTest {
         }
     }
 
+    /*
+      End-to-end tests against fake IdP and/or fake grpc relations-api
+     */
+
     @Test
     void testManagersHoldIntendedCredentialsInChannel() throws Exception {
         Config.AuthenticationConfig authnConfig = dummyNonDisabledAuthenticationConfig();
@@ -160,6 +164,10 @@ class RelationsGrpcClientsManagerTest {
         assertNotNull(cd4.getMetadata().get(authorizationKey));
         assertEquals("PRIVACY_AND_INTEGRITY", cd4.getCall().getSecurityLevel().toString());
     }
+
+    /*
+     Tests relying on reflection. Maybe be brittle and could be removed in future.
+     */
 
     @Test
     void testManagerReuseInternal() throws Exception {
@@ -237,7 +245,7 @@ class RelationsGrpcClientsManagerTest {
         assertEquals(0, insecureManagersSize);
     }
 
-    Config.AuthenticationConfig dummyNonDisabledAuthenticationConfig() {
+    public static Config.AuthenticationConfig dummyNonDisabledAuthenticationConfig() {
         return new Config.AuthenticationConfig() {
             @Override
             public Config.AuthMode mode() {
