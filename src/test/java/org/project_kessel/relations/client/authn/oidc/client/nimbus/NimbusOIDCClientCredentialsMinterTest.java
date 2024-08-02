@@ -12,7 +12,7 @@ public class NimbusOIDCClientCredentialsMinterTest {
     @Test
     void shouldReturnBearerHeaderWhenIdPAuthenticates() {
         var minter = new NimbusOIDCClientCredentialsMinter();
-        var config = RelationsGrpcClientsManagerTest.dummyNonDisabledAuthenticationConfig().clientCredentialsConfig();
+        var config = RelationsGrpcClientsManagerTest.dummyAuthConfigWithGoodOIDCClientCredentials().clientCredentialsConfig();
         OIDCClientCredentialsMinter.BearerHeader bearerHeader = null;
         try {
             FakeIdp fakeIdp = new FakeIdp(8090);
@@ -30,7 +30,7 @@ public class NimbusOIDCClientCredentialsMinterTest {
     @Test
     void shouldThrowExceptionWhenIdPAuthenticationFails() {
         var minter = new NimbusOIDCClientCredentialsMinter();
-        var config = RelationsGrpcClientsManagerTest.dummyNonDisabledAuthenticationConfig().clientCredentialsConfig();
+        var config = RelationsGrpcClientsManagerTest.dummyAuthConfigWithGoodOIDCClientCredentials().clientCredentialsConfig();
         FakeIdp fakeIdp = new FakeIdp(8090, false);
         try {
             fakeIdp.start();

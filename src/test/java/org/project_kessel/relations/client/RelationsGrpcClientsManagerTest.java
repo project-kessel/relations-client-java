@@ -136,7 +136,7 @@ public class RelationsGrpcClientsManagerTest {
 
     @Test
     void testManagersHoldIntendedCredentialsInChannel() throws Exception {
-        Config.AuthenticationConfig authnConfig = dummyNonDisabledAuthenticationConfig();
+        Config.AuthenticationConfig authnConfig = dummyAuthConfigWithGoodOIDCClientCredentials();
         var manager = RelationsGrpcClientsManager.forInsecureClients("localhost:7000");
         var manager2 = RelationsGrpcClientsManager.forInsecureClients("localhost:7001", authnConfig);
         var manager3 = RelationsGrpcClientsManager.forSecureClients("localhost:7002");
@@ -245,7 +245,7 @@ public class RelationsGrpcClientsManagerTest {
         assertEquals(0, insecureManagersSize);
     }
 
-    public static Config.AuthenticationConfig dummyNonDisabledAuthenticationConfig() {
+    public static Config.AuthenticationConfig dummyAuthConfigWithGoodOIDCClientCredentials() {
         return new Config.AuthenticationConfig() {
             @Override
             public Config.AuthMode mode() {
