@@ -12,50 +12,59 @@ public class CertUtil {
     private static final String certFileName = "certs/test.crt";
 
     public static void addTestCACertToTrustStore() {
-        final char sep = File.separatorChar;
-        File dir = new File(System.getProperty("java.home") + sep + "lib" + sep + "security");
-        File file = new File(dir, "cacerts");
         try {
-            InputStream localCertIn = new FileInputStream(file);
-            KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
-            keystore.load(localCertIn, passphrase);
-            localCertIn.close();
+            var keystore = loadKeystoreFromJdk();
             if (keystore.containsAlias(selfSignedAlias)) {
                 return;
             }
 
-            InputStream certIn = Thread.currentThread().getContextClassLoader().getResourceAsStream(certFileName);
-            BufferedInputStream bis = new BufferedInputStream(certIn);
-            CertificateFactory cf = CertificateFactory.getInstance("X.509");
-            while (bis.available() > 0) {
-                Certificate cert = cf.generateCertificate(bis);
-                keystore.setCertificateEntry(selfSignedAlias, cert);
-            }
-            certIn.close();
+            try(InputStream certIn = Thread.currentThread().getContextClassLoader().getResourceAsStream(certFileName);
+                BufferedInputStream bis = new BufferedInputStream(certIn)) {
 
-            OutputStream out = new FileOutputStream(file);
-            keystore.store(out, passphrase);
-            out.close();
-        } catch (NoSuchAlgorithmException | CertificateException | KeyStoreException | IOException |
-                 NullPointerException e) {
+                CertificateFactory cf = CertificateFactory.getInstance("X.509");
+                while (bis.available() > 0) {
+                    Certificate cert = cf.generateCertificate(bis);
+                    keystore.setCertificateEntry(selfSignedAlias, cert);
+                }
+
+                saveKeystoreToJdk(keystore);
+            }
+        } catch (CertificateException | KeyStoreException | IOException | NullPointerException e) {
             throw new RuntimeException(e);
         }
     }
 
     public static void removeTestCACertFromKeystore() {
-        final char sep = File.separatorChar;
-        File dir = new File(System.getProperty("java.home") + sep + "lib" + sep + "security");
-        File file = new File(dir, "cacerts");
+        var keystore = loadKeystoreFromJdk();
         try {
-            InputStream localCertIn = new FileInputStream(file);
-            KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
-            keystore.load(localCertIn, passphrase);
             keystore.deleteEntry(selfSignedAlias);
-            OutputStream out = new FileOutputStream(file);
-            keystore.store(out, passphrase);
-            out.close();
-        } catch (KeyStoreException | CertificateException | IOException | NoSuchAlgorithmException e) {
+            saveKeystoreToJdk(keystore);
+        } catch (KeyStoreException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static KeyStore loadKeystoreFromJdk() {
+        try (InputStream localCertIn = new FileInputStream(getCertFile())) {
+            KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
+            keystore.load(localCertIn, passphrase);
+            return keystore;
+        } catch (IOException | CertificateException | KeyStoreException | NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void saveKeystoreToJdk(KeyStore keystore) {
+        try (OutputStream out = new FileOutputStream(getCertFile())) {
+            keystore.store(out, passphrase);
+        } catch (IOException | CertificateException | KeyStoreException | NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static File getCertFile() {
+        final char sep = File.separatorChar;
+        File dir = new File(System.getProperty("java.home") + sep + "lib" + sep + "security");
+        return new File(dir, "cacerts");
     }
 }
