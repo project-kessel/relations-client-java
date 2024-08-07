@@ -1,0 +1,8 @@
+version: v2
+plugins:
+  - remote: buf.build/grpc/java:v1.64.0
+    out: ./target/generated-sources/
+  - remote: buf.build/protocolbuffers/java:v25.1
+    out: ./target/generated-sources/
+  - remote: buf.build/bufbuild/validate-java:v1.0.4
+    out: ./target/generated-sources/

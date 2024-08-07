@@ -82,11 +82,6 @@
       <artifactId>grpc-stub</artifactId>
       <version>1.64.0</version>
     </dependency>
-    <dependency>
-      <groupId>build.buf.protoc-gen-validate</groupId>
-      <artifactId>pgv-java-stub</artifactId>
-      <version>1.0.4</version>
-    </dependency>
     <dependency> <!-- necessary for Java 9+ -->
       <groupId>org.apache.tomcat</groupId>
       <artifactId>annotations-api</artifactId>
@@ -106,6 +101,11 @@
       <version>4.0.3.Final</version>
       <scope>test</scope>
     </dependency>
+     <dependency>
+      <groupId>build.buf.protoc-gen-validate</groupId>
+      <artifactId>pgv-java-stub</artifactId>
+      <version>1.0.4</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -118,33 +118,19 @@
     </extensions>
     <plugins>
       <plugin>
-        <groupId>org.xolstice.maven.plugins</groupId>
-        <artifactId>protobuf-maven-plugin</artifactId>
-        <version>0.6.1</version>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>3.6.3</version>
         <configuration>
-          <protocArtifact>com.google.protobuf:protoc:3.25.1:exe:${os.detected.classifier}</protocArtifact>
-          <pluginId>grpc-java</pluginId>
-          <pluginArtifact>io.grpc:protoc-gen-grpc-java:1.64.0:exe:${os.detected.classifier}</pluginArtifact>
+          <doclint>all,-missing</doclint>
         </configuration>
         <executions>
           <execution>
+            <id>attach-javadocs</id>
+            <phase>verify</phase>
             <goals>
-              <goal>compile</goal>
-              <goal>compile-custom</goal>
+              <goal>jar</goal>
             </goals>
-          </execution>
-          <execution>
-            <id>protoc-java-pgv</id>
-            <goals>
-              <goal>compile-custom</goal>
-            </goals>
-            <configuration>
-              <pluginParameter>lang=java</pluginParameter>
-              <pluginId>java-pgv</pluginId>
-              <pluginArtifact>
-                build.buf.protoc-gen-validate:protoc-gen-validate:1.0.4:exe:${os.detected.classifier}
-              </pluginArtifact>
-            </configuration>
           </execution>
         </executions>
       </plugin>
@@ -162,20 +148,39 @@
         </executions>
       </plugin>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <version>3.6.3</version>
-        <configuration>
-          <doclint>all,-missing</doclint>
-        </configuration>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>3.3.0</version>
         <executions>
           <execution>
-            <id>attach-javadocs</id>
-            <phase>verify</phase>
-            <goals>
-              <goal>jar</goal>
-            </goals>
+              <id>generate-sources</id>
+              <phase>generate-sources</phase>
+              <goals>
+                  <goal>exec</goal>
+              </goals>
           </execution>
+        </executions>
+        <configuration>
+            <executable>./runBuf.sh</executable>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>3.6.0</version>
+        <executions>
+            <execution>
+                <id>add-source</id>
+                <phase>generate-sources</phase>
+                <goals>
+                    <goal>add-source</goal>
+                </goals>
+                <configuration>
+                    <sources>
+                        <source>${project.build.directory}/generated-sources</source>
+                    </sources>
+                </configuration>
+            </execution>
         </executions>
       </plugin>
       <plugin>
