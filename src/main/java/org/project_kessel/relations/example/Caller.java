@@ -1,8 +1,7 @@
 package org.project_kessel.relations.example;
 
 import org.project_kessel.api.relations.v1beta1.*;
-import org.project_kessel.api.relations.v1.GetLivezRequest;
-import org.project_kessel.api.relations.v1.GetReadyzRequest;
+import org.project_kessel.relations.client.RelationsGrpcClientsManager;
 import io.grpc.stub.StreamObserver;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
@@ -115,8 +114,6 @@ public class Caller {
                 })
                 .await().indefinitely();
 
-        getLivezExample();
-        getReadyzExample();
         getRelationshipsExample();
         lookupSubjectsExample();
         lookupResourcesExample();
@@ -200,45 +197,6 @@ public class Caller {
 
         System.out.println("Collected reactive non-blocking responses: " + responses2);
 
-    }
-
-    public static void getLivezExample() {
-        var url = "localhost:9000";
-
-        var clientsManager = RelationsGrpcClientsManager.forInsecureClients(url);
-        var healthClient = clientsManager.getHealthClient();
-
-        var getLivezRequest = GetLivezRequest.newBuilder().build();
-
-        /* Blocking */
-        var getLivezResponse = healthClient.livez(getLivezRequest);
-        var status = getLivezResponse.getStatus().equals("OK");
-
-        if (status) {
-            System.out.println("Blocking: OK");
-        } else {
-            System.out.println("Blocking: Unavailable");
-        }
-    }
-
-
-    public static void getReadyzExample() {
-        var url = "localhost:9000";
-
-        var clientsManager = RelationsGrpcClientsManager.forInsecureClients(url);
-        var healthClient = clientsManager.getHealthClient();
-
-        var getReadyzRequest = GetReadyzRequest.newBuilder().build();
-    
-        /* Blocking */
-        var getReadyzResponse = healthClient.readyz(getReadyzRequest);
-        var status = getReadyzResponse.getStatus().equals("OK");
-
-        if (status) {
-            System.out.println("Blocking: OK");
-        } else {
-            System.out.println("Blocking: Unavailable");
-        }
     }
 
     public static void lookupSubjectsExample() {
