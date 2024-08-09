@@ -10,9 +10,11 @@ public class CallCredentialsFactory {
 
     }
 
-    public static CallCredentials create(Config.AuthenticationConfig authnConfig) throws CallCredentialsCreationException {
+    public static CallCredentials create(Config.AuthenticationConfig authnConfig) 
+            throws CallCredentialsCreationException {
         if (authnConfig == null) {
-            throw new CallCredentialsCreationException("AuthenticationConfig is required to create CallCredentials and must not be null.");
+            throw new CallCredentialsCreationException(
+                "AuthenticationConfig is required to create CallCredentials and must not be null.");
         }
 
         try {

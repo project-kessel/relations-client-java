@@ -3,35 +3,39 @@ package org.project_kessel.relations.client.authn.oidc.client;
 import io.grpc.Metadata;
 import io.grpc.Status;
 import org.project_kessel.relations.client.Config;
-
 import java.util.Optional;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class OIDCClientCredentialsCallCredentials extends io.grpc.CallCredentials {
-    static final Metadata.Key<String> authorizationKey = Metadata.Key.of("Authorization", Metadata.ASCII_STRING_MARSHALLER);
+    static final Metadata.Key<String> authorizationKey = Metadata.Key.of(
+            "Authorization", Metadata.ASCII_STRING_MARSHALLER);
 
     private final Config.OIDCClientCredentialsConfig clientCredentialsConfig;
     private final OIDCClientCredentialsMinter minter;
 
-    private final AtomicReference<OIDCClientCredentialsMinter.BearerHeader> storedBearerHeaderRef = new AtomicReference<>();
+    private final AtomicReference<OIDCClientCredentialsMinter.BearerHeader> storedBearerHeaderRef = 
+            new AtomicReference<>();
 
-    public OIDCClientCredentialsCallCredentials(Config.AuthenticationConfig authnConfig) throws OIDCClientCredentialsCallCredentialsException {
+    public OIDCClientCredentialsCallCredentials(Config.AuthenticationConfig authnConfig) 
+            throws OIDCClientCredentialsCallCredentialsException {
         this.clientCredentialsConfig = validateAndExtractConfig(authnConfig);
 
         Optional<String> minterImpl = clientCredentialsConfig.oidcClientCredentialsMinterImplementation();
         try {
-            if(minterImpl.isPresent()) {
+            if (minterImpl.isPresent()) {
                 this.minter = OIDCClientCredentialsMinter.forName(minterImpl.get());
             } else {
                 this.minter = OIDCClientCredentialsMinter.forDefaultImplementation();
             }
         } catch (OIDCClientCredentialsMinter.OIDCClientCredentialsMinterException e) {
-            throw new OIDCClientCredentialsCallCredentialsException("Couldn't create GrpcCallCredentials because minter impl not instantiated.", e);
+            throw new OIDCClientCredentialsCallCredentialsException(
+                    "Couldn't create GrpcCallCredentials because minter impl not instantiated.", e);
         }
     }
 
-    OIDCClientCredentialsCallCredentials(Config.OIDCClientCredentialsConfig clientCredentialsConfig, OIDCClientCredentialsMinter minter) {
+    OIDCClientCredentialsCallCredentials(Config.OIDCClientCredentialsConfig clientCredentialsConfig,
+            OIDCClientCredentialsMinter minter) {
         this.clientCredentialsConfig = clientCredentialsConfig;
         this.minter = minter;
     }
@@ -42,7 +46,8 @@ public class OIDCClientCredentialsCallCredentials extends io.grpc.CallCredential
             try {
                 synchronized (storedBearerHeaderRef) {
                     if (storedBearerHeaderRef.get() == null || storedBearerHeaderRef.get().isExpired()) {
-                        storedBearerHeaderRef.set(minter.authenticateAndRetrieveAuthorizationHeader(clientCredentialsConfig));
+                        storedBearerHeaderRef.set(minter
+                                .authenticateAndRetrieveAuthorizationHeader(clientCredentialsConfig));
                     }
 
                     Metadata headers = new Metadata();
@@ -65,18 +70,23 @@ public class OIDCClientCredentialsCallCredentials extends io.grpc.CallCredential
     }
 
     /* We don't know that smallrye config validation will be used by clients, so do some validation here. */
-    static Config.OIDCClientCredentialsConfig validateAndExtractConfig(Config.AuthenticationConfig authnConfig) throws OIDCClientCredentialsCallCredentialsException {
+    static Config.OIDCClientCredentialsConfig validateAndExtractConfig(Config.AuthenticationConfig authnConfig) 
+            throws OIDCClientCredentialsCallCredentialsException {
         if (authnConfig.clientCredentialsConfig().isEmpty()) {
-            throw new OIDCClientCredentialsCallCredentialsException("ClientCredentialsConfig is required for OIDC client credentials authentication method.");
+            throw new OIDCClientCredentialsCallCredentialsException(
+                "ClientCredentialsConfig is required for OIDC client credentials authentication method.");
         }
-        if(authnConfig.clientCredentialsConfig().get().issuer() == null) {
-            throw new OIDCClientCredentialsCallCredentialsException("ClientCredentialsConfig Issuer must not be null.");
+        if (authnConfig.clientCredentialsConfig().get().issuer() == null) {
+            throw new OIDCClientCredentialsCallCredentialsException(
+                "ClientCredentialsConfig Issuer must not be null.");
         }
-        if(authnConfig.clientCredentialsConfig().get().clientId() == null) {
-            throw new OIDCClientCredentialsCallCredentialsException("ClientCredentialsConfig Client id must not be null.");
+        if (authnConfig.clientCredentialsConfig().get().clientId() == null) {
+            throw new OIDCClientCredentialsCallCredentialsException(
+                "ClientCredentialsConfig Client id must not be null.");
         }
-        if(authnConfig.clientCredentialsConfig().get().clientSecret() == null) {
-            throw new OIDCClientCredentialsCallCredentialsException("ClientCredentialsConfig Client secret must not be null.");
+        if (authnConfig.clientCredentialsConfig().get().clientSecret() == null) {
+            throw new OIDCClientCredentialsCallCredentialsException(
+                "ClientCredentialsConfig Client secret must not be null.");
         }
 
         return authnConfig.clientCredentialsConfig().get();

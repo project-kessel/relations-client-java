@@ -3,7 +3,6 @@ package org.project_kessel.relations.client;
 import io.smallrye.config.ConfigMapping;
 import io.smallrye.config.WithDefault;
 import io.smallrye.config.WithName;
-
 import java.util.Optional;
 
 /**
@@ -30,17 +29,22 @@ public interface Config {
     interface AuthenticationConfig {
         @WithDefault("disabled")
         AuthMode mode();
+        
         @WithName("client")
         Optional<OIDCClientCredentialsConfig> clientCredentialsConfig();
     }
 
-     interface OIDCClientCredentialsConfig {
+    interface OIDCClientCredentialsConfig {
         String issuer();
+        
         @WithName("id")
         String clientId();
+        
         @WithName("secret")
         String clientSecret();
+        
         Optional<String[]> scope();
+
         Optional<String> oidcClientCredentialsMinterImplementation();
     }
 }
