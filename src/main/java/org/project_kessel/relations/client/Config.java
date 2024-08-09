@@ -26,17 +26,22 @@ public interface Config {
     interface AuthenticationConfig {
         @WithDefault("disabled")
         AuthMode mode();
+        
         @WithName("client")
         Optional<OIDCClientCredentialsConfig> clientCredentialsConfig();
     }
 
-     interface OIDCClientCredentialsConfig {
+    interface OIDCClientCredentialsConfig {
         String issuer();
+        
         @WithName("id")
         String clientId();
+        
         @WithName("secret")
         String clientSecret();
+        
         Optional<String[]> scope();
+
         Optional<String> oidcClientCredentialsMinterImplementation();
     }
 }
