@@ -1,8 +1,13 @@
 package org.project_kessel.relations.client;
 
-import io.grpc.*;
+import io.grpc.Grpc;
+import io.grpc.TlsChannelCredentials;
+import io.grpc.ChannelCredentials;
+import io.grpc.CompositeChannelCredentials;
+import io.grpc.CallCredentials;
+import io.grpc.ManagedChannel;
+import io.grpc.InsecureChannelCredentials;
 import org.project_kessel.relations.client.authn.CallCredentialsFactory;
-
 import java.util.HashMap;
 
 public class RelationsGrpcClientsManager {
@@ -19,7 +24,8 @@ public class RelationsGrpcClientsManager {
         return insecureManagers.get(targetUrl);
     }
 
-    public static synchronized RelationsGrpcClientsManager forInsecureClients(String targetUrl, Config.AuthenticationConfig authnConfig) throws RuntimeException {
+    public static synchronized RelationsGrpcClientsManager forInsecureClients(String targetUrl, 
+            Config.AuthenticationConfig authnConfig) throws RuntimeException {
         if (!insecureManagers.containsKey(targetUrl)) {
             try {
                 var manager = new RelationsGrpcClientsManager(targetUrl,
@@ -42,7 +48,8 @@ public class RelationsGrpcClientsManager {
         return secureManagers.get(targetUrl);
     }
 
-    public static synchronized RelationsGrpcClientsManager forSecureClients(String targetUrl, Config.AuthenticationConfig authnConfig) {
+    public static synchronized RelationsGrpcClientsManager forSecureClients(String targetUrl, 
+            Config.AuthenticationConfig authnConfig) {
         if (!secureManagers.containsKey(targetUrl)) {
             var tlsChannelCredentials = TlsChannelCredentials.create();
             try {
@@ -72,7 +79,7 @@ public class RelationsGrpcClientsManager {
         var iter = insecureManagers.entrySet().iterator();
         while (iter.hasNext()) {
             var entry = iter.next();
-            if(entry.getValue().channel == managerToShutdown.channel) {
+            if (entry.getValue().channel == managerToShutdown.channel) {
                 entry.getValue().closeClientChannel();
                 iter.remove();
                 return;
@@ -81,7 +88,7 @@ public class RelationsGrpcClientsManager {
         iter = secureManagers.entrySet().iterator();
         while (iter.hasNext()) {
             var entry = iter.next();
-            if(entry.getValue().channel == managerToShutdown.channel) {
+            if (entry.getValue().channel == managerToShutdown.channel) {
                 entry.getValue().closeClientChannel();
                 iter.remove();
                 return;
@@ -104,7 +111,8 @@ public class RelationsGrpcClientsManager {
      * @param serverCredentials authenticates the server for TLS or are InsecureChannelCredentials
      * @param authnCredentials authenticates the client on each rpc
      */
-    private RelationsGrpcClientsManager(String targetUrl, ChannelCredentials serverCredentials, CallCredentials authnCredentials) {
+    private RelationsGrpcClientsManager(String targetUrl, ChannelCredentials serverCredentials, 
+            CallCredentials authnCredentials) {
         this.channel = Grpc.newChannelBuilder(targetUrl,
                 CompositeChannelCredentials.create(serverCredentials, authnCredentials)).build();
     }

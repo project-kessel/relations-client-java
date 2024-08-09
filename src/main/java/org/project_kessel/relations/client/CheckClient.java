@@ -7,7 +7,6 @@ import io.grpc.Channel;
 import io.grpc.stub.StreamObserver;
 import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.operators.multi.processors.UnicastProcessor;
-
 import java.util.logging.Logger;
 
 public class CheckClient {
@@ -24,6 +23,10 @@ public class CheckClient {
     public void check(CheckRequest request,
                       StreamObserver<CheckResponse> responseObserver) {
         asyncStub.check(request, responseObserver);
+    }
+
+    public CheckResponse check(CheckRequest request) {
+        return blockingStub.check(request);
     }
 
     public Uni<CheckResponse> checkUni(CheckRequest request) {
@@ -50,9 +53,5 @@ public class CheckClient {
         check(request, streamObserver);
 
         return uni;
-    }
-
-    public CheckResponse check(CheckRequest request) {
-        return blockingStub.check(request);
     }
 }

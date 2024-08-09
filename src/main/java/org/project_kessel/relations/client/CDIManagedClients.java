@@ -15,16 +15,17 @@ public class CDIManagedClients {
     RelationsGrpcClientsManager getManager(Config config) {
         var isSecureClients = config.isSecureClients();
         var targetUrl = config.targetUrl();
-        var authnEnabled = config.authenticationConfig().map(t -> !t.mode().equals(Config.AuthMode.DISABLED)).orElse(false);
+        var authnEnabled = config.authenticationConfig().map(t -> !t.mode().equals(Config.AuthMode.DISABLED))
+                .orElse(false);
 
         if (isSecureClients) {
-            if(authnEnabled) {
+            if (authnEnabled) {
                 return RelationsGrpcClientsManager.forSecureClients(targetUrl, config.authenticationConfig().get());
             }
             return RelationsGrpcClientsManager.forSecureClients(targetUrl);
         }
 
-        if(authnEnabled) {
+        if (authnEnabled) {
             return RelationsGrpcClientsManager.forInsecureClients(targetUrl, config.authenticationConfig().get());
         }
         return RelationsGrpcClientsManager.forInsecureClients(targetUrl);

@@ -1,25 +1,28 @@
 package org.project_kessel.relations.client.authn.oidc.client;
 
 import org.project_kessel.relations.client.Config;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 public abstract class OIDCClientCredentialsMinter {
-    private static final Class<?> defaultMinter = org.project_kessel.relations.client.authn.oidc.client.nimbus.NimbusOIDCClientCredentialsMinter.class;
+    private static final Class<?> defaultMinter = 
+            org.project_kessel.relations.client.authn.oidc.client.nimbus.NimbusOIDCClientCredentialsMinter.class;
 
     public static OIDCClientCredentialsMinter forDefaultImplementation() throws OIDCClientCredentialsMinterException {
         return forClass(defaultMinter);
     }
 
-    public static OIDCClientCredentialsMinter forClass(Class<?> minterClass) throws OIDCClientCredentialsMinterException {
+    public static OIDCClientCredentialsMinter forClass(Class<?> minterClass) 
+            throws OIDCClientCredentialsMinterException {
         try {
             Constructor<?> constructor  = minterClass.getConstructor();
-            return (OIDCClientCredentialsMinter)constructor.newInstance();
-        } catch (InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException e) {
-            throw new OIDCClientCredentialsMinterException("Can't create instance of OIDC client credentials minter", e);
+            return (OIDCClientCredentialsMinter) constructor.newInstance();
+        } catch (InvocationTargetException | NoSuchMethodException 
+                | InstantiationException | IllegalAccessException e) {
+            throw new OIDCClientCredentialsMinterException(
+                    "Can't create instance of OIDC client credentials minter", e);
         }
     }
 
@@ -27,12 +30,14 @@ public abstract class OIDCClientCredentialsMinter {
         try {
             Class<?> minterImplClass = Class.forName(name);
             return forClass(minterImplClass);
-        } catch(ClassNotFoundException e) {
-            throw new OIDCClientCredentialsMinterException("Can't find the specified OIDC client credentials minter implementation", e);
+        } catch (ClassNotFoundException e) {
+            throw new OIDCClientCredentialsMinterException(
+                    "Can't find the specified OIDC client credentials minter implementation", e);
         }
     }
 
-    public abstract BearerHeader authenticateAndRetrieveAuthorizationHeader(Config.OIDCClientCredentialsConfig clientConfig) throws OIDCClientCredentialsMinterException;
+    public abstract BearerHeader authenticateAndRetrieveAuthorizationHeader(Config.OIDCClientCredentialsConfig
+            clientConfig) throws OIDCClientCredentialsMinterException;
 
     public static class BearerHeader {
         private final String authorizationHeader;
@@ -62,7 +67,7 @@ public abstract class OIDCClientCredentialsMinter {
         if (expiresIn != 0) {
             // this processing happens some time after token is granted with lifetime so subtract buffer from lifetime
             long bufferSeconds = 60;
-            if(expiresIn < bufferSeconds) {
+            if (expiresIn < bufferSeconds) {
                 expiryTime = Optional.empty();
             } else {
                 expiryTime = Optional.of(LocalDateTime.now().plusSeconds(expiresIn).minusSeconds(bufferSeconds));
@@ -82,6 +87,7 @@ public abstract class OIDCClientCredentialsMinter {
         public OIDCClientCredentialsMinterException(String message) {
             super(message);
         }
+        
         public OIDCClientCredentialsMinterException(String message, Throwable cause) {
             super(message, cause);
         }

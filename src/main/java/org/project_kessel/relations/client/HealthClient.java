@@ -1,7 +1,6 @@
 package org.project_kessel.relations.client;
 
 import java.util.logging.Logger;
-
 import io.grpc.Channel;
 import org.project_kessel.api.relations.v1.GetLivezResponse;
 import org.project_kessel.api.relations.v1.GetLivezRequest;
@@ -18,11 +17,11 @@ public class HealthClient {
         blockingStub = KesselHealthServiceGrpc.newBlockingStub(channel);
     }
 
-     public GetReadyzResponse readyz(GetReadyzRequest request) {
+    public GetReadyzResponse readyz(GetReadyzRequest request) {
         return blockingStub.getReadyz(request);
     }
     
-     public GetLivezResponse livez(GetLivezRequest request) {
+    public GetLivezResponse livez(GetLivezRequest request) {
         return blockingStub.getLivez(request);
     }
 }
