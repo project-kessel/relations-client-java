@@ -1,6 +1,20 @@
 package org.project_kessel.relations.client;
 
-import org.project_kessel.api.relations.v1beta1.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.project_kessel.api.relations.v1beta1.KesselTupleServiceGrpc;
+import org.project_kessel.api.relations.v1beta1.KesselCheckServiceGrpc;
+import org.project_kessel.api.relations.v1beta1.KesselLookupServiceGrpc;
+import org.project_kessel.api.relations.v1beta1.CheckRequest;
+import org.project_kessel.api.relations.v1beta1.CheckResponse;
+import org.project_kessel.api.relations.v1beta1.ReadTuplesRequest;
+import org.project_kessel.api.relations.v1beta1.ReadTuplesResponse;
+import org.project_kessel.api.relations.v1beta1.LookupSubjectsRequest;
+import org.project_kessel.api.relations.v1beta1.LookupSubjectsResponse;
+import org.project_kessel.api.relations.v1beta1.ObjectReference;
+import org.project_kessel.api.relations.v1beta1.ObjectType;
+import org.project_kessel.api.relations.v1beta1.Relationship;
+import org.project_kessel.api.relations.v1beta1.SubjectReference;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
@@ -13,11 +27,9 @@ import org.jboss.weld.junit5.WeldSetup;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
 import java.io.IOException;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Use Weld as a test container to check CDI functionality.
@@ -25,7 +37,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @EnableWeld
 class CDIManagedRelationsClientsContainerTests {
     @WeldSetup
-    public WeldInitiator weld = WeldInitiator.from(new Weld().setBeanDiscoveryMode(BeanDiscoveryMode.ALL).addBeanClass(TestConfig.class)).build();
+    public WeldInitiator weld = WeldInitiator.from(new Weld().setBeanDiscoveryMode(BeanDiscoveryMode.ALL)
+            .addBeanClass(TestConfig.class)).build();
 
     private static final int testServerPort = 7000;
 
@@ -50,7 +63,8 @@ class CDIManagedRelationsClientsContainerTests {
         serverBuilder.addService(new KesselCheckServiceGrpc.KesselCheckServiceImplBase() {
             @Override
             public void check(CheckRequest request, StreamObserver<CheckResponse> responseObserver) {
-                responseObserver.onNext(CheckResponse.newBuilder().setAllowed(CheckResponse.Allowed.ALLOWED_TRUE).build());
+                responseObserver.onNext(CheckResponse.newBuilder().setAllowed(CheckResponse.Allowed.ALLOWED_TRUE)
+                        .build());
                 responseObserver.onCompleted();
             }
         });
@@ -69,7 +83,8 @@ class CDIManagedRelationsClientsContainerTests {
         });
         serverBuilder.addService(new KesselLookupServiceGrpc.KesselLookupServiceImplBase() {
             @Override
-            public void lookupSubjects(LookupSubjectsRequest request, StreamObserver<LookupSubjectsResponse> responseObserver) {
+            public void lookupSubjects(LookupSubjectsRequest request, 
+                    StreamObserver<LookupSubjectsResponse> responseObserver) {
                 responseObserver.onNext(LookupSubjectsResponse.newBuilder().setSubject(
                         SubjectReference.newBuilder().setSubject(
                                 ObjectReference.newBuilder().setId("TestSubjectId")

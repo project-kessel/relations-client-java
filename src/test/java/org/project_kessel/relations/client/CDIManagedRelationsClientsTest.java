@@ -1,5 +1,9 @@
 package org.project_kessel.relations.client;
 
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.any;
+
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
@@ -7,7 +11,6 @@ import org.project_kessel.clients.authn.AuthenticationConfig;
 
 import java.util.Optional;
 
-import static org.mockito.Mockito.*;
 
 class CDIManagedRelationsClientsTest {
     @Test
@@ -146,7 +149,7 @@ class CDIManagedRelationsClientsTest {
 
             @Override
             public Optional<Config.OIDCClientCredentialsConfig> clientCredentialsConfig() {
-                if(!authnEnabled) {
+                if (!authnEnabled) {
                     return Optional.empty();
                 }
 

@@ -31,7 +31,8 @@ public class RelationsGrpcClientsManagerTest {
         var relationTuplesChannel = ((KesselTupleServiceGrpc.KesselTupleServiceStub)relationTuplesAsyncStubField.get(relationTuplesClient)).getChannel();
         var lookupAsyncStubField = KesselClient.class.getDeclaredField("asyncStub");
         lookupAsyncStubField.setAccessible(true);
-        var lookupChannel = ((KesselLookupServiceGrpc.KesselLookupServiceStub)lookupAsyncStubField.get(lookupClient)).getChannel();
+        var lookupChannel = ((KesselLookupServiceGrpc.KesselLookupServiceStub) lookupAsyncStubField
+                .get(lookupClient)).getChannel();
 
         assertEquals(checkChannel, relationTuplesChannel);
         assertEquals(lookupChannel, relationTuplesChannel);

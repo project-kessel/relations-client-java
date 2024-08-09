@@ -1,13 +1,12 @@
 package org.project_kessel.relations.client;
 
-import io.smallrye.config.SmallRyeConfigBuilder;
+import static org.junit.jupiter.api.Assertions.fail;
 
+import io.smallrye.config.SmallRyeConfigBuilder;
 import io.smallrye.config.common.MapBackedConfigSource;
 import org.junit.jupiter.api.Test;
-
 import java.util.HashMap;
 
-import static org.junit.jupiter.api.Assertions.fail;
 
 class ConfigTest {
 
@@ -18,19 +17,18 @@ class ConfigTest {
         try {
             new SmallRyeConfigBuilder()
                     .withSources(new MapBackedConfigSource("test", new HashMap<>(), Integer.MAX_VALUE) {
-                                     @Override
-                                     public String getValue(String propertyName) {
-                                         if ("relations-api.target-url".equals(propertyName)) {
-                                             return "http://localhost:8080";
-                                         }
-                                         return null;
-                                     }
-                                 }
+                                @Override
+                                public String getValue(String propertyName) {
+                                    if ("relations-api.target-url".equals(propertyName)) {
+                                        return "http://localhost:8080";
+                                    }
+                                    return null;
+                                }
+                            }
                     )
                     .withMapping(Config.class)
                     .build();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             fail("Generating a config objective with minimal config should not fail.");
         }
     }
