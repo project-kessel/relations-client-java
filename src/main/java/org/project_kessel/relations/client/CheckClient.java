@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 public class CheckClient {
     private static final Logger logger = Logger.getLogger(CheckClient.class.getName());
 
-    private final KesselCheckServiceGrpc.KesselCheckServiceStub asyncStub;
+    final KesselCheckServiceGrpc.KesselCheckServiceStub asyncStub;
     private final KesselCheckServiceGrpc.KesselCheckServiceBlockingStub blockingStub;
 
     CheckClient(Channel channel) {
@@ -22,7 +22,7 @@ public class CheckClient {
     }
 
     public void check(CheckRequest request,
-                      StreamObserver<CheckResponse> responseObserver) {
+            StreamObserver<CheckResponse> responseObserver) {
         asyncStub.check(request, responseObserver);
     }
 

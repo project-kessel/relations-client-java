@@ -115,6 +115,8 @@ public class Caller {
                 })
                 .await().indefinitely();
 
+        
+
         getLivezExample();
         getReadyzExample();
         getRelationshipsExample();

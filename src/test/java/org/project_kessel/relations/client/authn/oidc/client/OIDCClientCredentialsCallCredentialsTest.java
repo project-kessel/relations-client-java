@@ -13,7 +13,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.project_kessel.relations.client.authn.oidc.client.OIDCClientCredentialsMinter.getDefaultMinterImplementation;
+import static org.project_kessel.relations.client.authn.oidc.client.ClientCredentialsRefreshers.getDefaultMinterImplementation;
 
 public class OIDCClientCredentialsCallCredentialsTest {
 
@@ -22,8 +22,7 @@ public class OIDCClientCredentialsCallCredentialsTest {
         try {
             var authConfig = makeAuthConfig(null, "some", "some");
             new OIDCClientCredentialsCallCredentials(authConfig);
-        }
-        catch (OIDCClientCredentialsCallCredentials.OIDCClientCredentialsCallCredentialsException e) {
+        } catch (OIDCClientCredentialsCallCredentials.OIDCClientCredentialsCallCredentialsException e) {
             return; // expected
         }
 
@@ -35,8 +34,7 @@ public class OIDCClientCredentialsCallCredentialsTest {
         try {
             var authConfig = makeAuthConfig("some", null, "some");
             new OIDCClientCredentialsCallCredentials(authConfig);
-        }
-        catch (OIDCClientCredentialsCallCredentials.OIDCClientCredentialsCallCredentialsException e) {
+        } catch (OIDCClientCredentialsCallCredentials.OIDCClientCredentialsCallCredentialsException e) {
             return; // expected
         }
 
@@ -48,8 +46,7 @@ public class OIDCClientCredentialsCallCredentialsTest {
         try {
             var authConfig = makeAuthConfig("some", "some", null);
             new OIDCClientCredentialsCallCredentials(authConfig);
-        }
-        catch (OIDCClientCredentialsCallCredentials.OIDCClientCredentialsCallCredentialsException e) {
+        } catch (OIDCClientCredentialsCallCredentials.OIDCClientCredentialsCallCredentialsException e) {
             return; // expected
         }
 
@@ -62,8 +59,7 @@ public class OIDCClientCredentialsCallCredentialsTest {
                 Optional.of("one.bogus.clazz"));
         try {
             new OIDCClientCredentialsCallCredentials(authConfig);
-        }
-        catch (OIDCClientCredentialsCallCredentials.OIDCClientCredentialsCallCredentialsException e) {
+        } catch (OIDCClientCredentialsCallCredentials.OIDCClientCredentialsCallCredentialsException e) {
             return; // expected
         }
 
@@ -76,8 +72,7 @@ public class OIDCClientCredentialsCallCredentialsTest {
                 Optional.of(getDefaultMinterImplementation().getName()));
         try {
             new OIDCClientCredentialsCallCredentials(authConfig);
-        }
-        catch (OIDCClientCredentialsCallCredentials.OIDCClientCredentialsCallCredentialsException e) {
+        } catch (OIDCClientCredentialsCallCredentials.OIDCClientCredentialsCallCredentialsException e) {
             fail("Should be able create default minter with no problems.");
         }
     }
@@ -88,8 +83,7 @@ public class OIDCClientCredentialsCallCredentialsTest {
                 Optional.empty());
         try {
             new OIDCClientCredentialsCallCredentials(authConfig);
-        }
-        catch (OIDCClientCredentialsCallCredentials.OIDCClientCredentialsCallCredentialsException e) {
+        } catch (OIDCClientCredentialsCallCredentials.OIDCClientCredentialsCallCredentialsException e) {
             fail("Should be able create default minter with no problems.");
         }
     }
@@ -134,7 +128,8 @@ public class OIDCClientCredentialsCallCredentialsTest {
         callCreds.applyRequestMetadata(null, new DefaultEventExecutor(), metaDataApplier2);
 
         latch2.await();
-        // token0 is the original minted token -- shows there was no second authentication and new token
+        // token0 is the original minted token -- shows there was no second
+        // authentication and new token
         assertEquals("token0", metaDataRef.get().get(OIDCClientCredentialsCallCredentials.authorizationKey));
         assertNull(statusRef.get());
     }
@@ -160,7 +155,8 @@ public class OIDCClientCredentialsCallCredentialsTest {
         callCreds.applyRequestMetadata(null, new DefaultEventExecutor(), metaDataApplier2);
 
         latch2.await();
-        // token1 is the second minted token -- shows that when out of lifetime there is a second authn and new token
+        // token1 is the second minted token -- shows that when out of lifetime there is
+        // a second authn and new token
         assertEquals("token1", metaDataRef.get().get(OIDCClientCredentialsCallCredentials.authorizationKey));
         assertNull(statusRef.get());
     }
@@ -184,12 +180,13 @@ public class OIDCClientCredentialsCallCredentialsTest {
         assertEquals(Status.Code.UNAUTHENTICATED, statusRef.get().getCode());
     }
 
-    static OIDCClientCredentialsMinter makeFakeMinter(boolean alwaysSucceedsOrFails, long tokensExpireIn) {
-        return new OIDCClientCredentialsMinter() {
+    static ClientCredentialsRefreshers makeFakeMinter(boolean alwaysSucceedsOrFails, long tokensExpireIn) {
+        return new ClientCredentialsRefreshers() {
             int mintedNumber = 0;
 
             @Override
-            public BearerHeader authenticateAndRetrieveAuthorizationHeader(Config.OIDCClientCredentialsConfig clientConfig) throws OIDCClientCredentialsMinterException {
+            public BearerHeader authenticateAndRetrieveAuthorizationHeader(
+                    Config.OIDCClientCredentialsConfig clientConfig) throws OIDCClientCredentialsMinterException {
                 if (!alwaysSucceedsOrFails) {
                     throw new OIDCClientCredentialsMinterException("Authentication failed.");
                 }
@@ -200,7 +197,8 @@ public class OIDCClientCredentialsCallCredentialsTest {
         };
     }
 
-    static CallCredentials.MetadataApplier makeFakeMetadataApplier(AtomicReference<Metadata> metaDataRef, AtomicReference<Status> statusRef, CountDownLatch latch) {
+    static CallCredentials.MetadataApplier makeFakeMetadataApplier(AtomicReference<Metadata> metaDataRef,
+            AtomicReference<Status> statusRef, CountDownLatch latch) {
         return new CallCredentials.MetadataApplier() {
             @Override
             public void apply(Metadata headers) {
@@ -220,7 +218,8 @@ public class OIDCClientCredentialsCallCredentialsTest {
         return makeAuthConfig(issuer, clientId, clientSecret, Optional.empty(), Optional.empty());
     }
 
-    public static Config.AuthenticationConfig makeAuthConfig(String issuer, String clientId, String clientSecret, Optional<String[]> scope, Optional<String> minterImpl) {
+    public static Config.AuthenticationConfig makeAuthConfig(String issuer, String clientId, String clientSecret,
+            Optional<String[]> scope, Optional<String> minterImpl) {
         return new Config.AuthenticationConfig() {
             @Override
             public Config.AuthMode mode() {

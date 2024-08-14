@@ -7,17 +7,17 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.project_kessel.relations.client.authn.oidc.client.OIDCClientCredentialsMinter.getExpiryDateFromExpiresIn;
+import static org.project_kessel.relations.client.authn.oidc.client.ClientCredentialsRefreshers.getExpiryDateFromExpiresIn;
 
 class OIDCClientCredentialsMinterTest {
 
     @Test
     void testCreateDefaultMinter() {
-        Class<?> defaultMinterClass = OIDCClientCredentialsMinter.getDefaultMinterImplementation();
+        Class<?> defaultMinterClass = ClientCredentialsRefreshers.getDefaultMinterImplementation();
         try {
-            var minter = OIDCClientCredentialsMinter.forClass(defaultMinterClass);
+            var minter = ClientCredentialsRefreshers.forClass(defaultMinterClass);
             assertInstanceOf(defaultMinterClass, minter);
-        } catch (OIDCClientCredentialsMinter.OIDCClientCredentialsMinterException e) {
+        } catch (ClientCredentialsRefreshers.OIDCClientCredentialsMinterException e) {
             fail("Creating minter from default implementation name should not throw an OIDCClientCredentialsMinterException");
         }
     }
@@ -26,9 +26,9 @@ class OIDCClientCredentialsMinterTest {
     void testCreateMinterFromClass() {
         Class<?> testMinterClass = TestMinter.class;
         try {
-            var minter = OIDCClientCredentialsMinter.forClass(testMinterClass);
+            var minter = ClientCredentialsRefreshers.forClass(testMinterClass);
             assertInstanceOf(testMinterClass, minter);
-        } catch (OIDCClientCredentialsMinter.OIDCClientCredentialsMinterException e) {
+        } catch (ClientCredentialsRefreshers.OIDCClientCredentialsMinterException e) {
             fail("Creating minter from test implementation name should not throw an OIDCClientCredentialsMinterException");
         }
     }
@@ -37,8 +37,8 @@ class OIDCClientCredentialsMinterTest {
     void testCreateMinterFromName() {
         String testMinterName = TestMinter.class.getName();
         try {
-            OIDCClientCredentialsMinter.forName(testMinterName);
-        } catch (OIDCClientCredentialsMinter.OIDCClientCredentialsMinterException e) {
+            ClientCredentialsRefreshers.forName(testMinterName);
+        } catch (ClientCredentialsRefreshers.OIDCClientCredentialsMinterException e) {
             fail("Creating minter from test implementation name should not throw an OIDCClientCredentialsMinterException");
         }
     }
@@ -47,8 +47,8 @@ class OIDCClientCredentialsMinterTest {
     void testCreateMinterFromFakeImplNameThrowsException() {
         String defaultMinterName = "absolutely.not.a.valid.Implementation";
         try {
-            OIDCClientCredentialsMinter.forName(defaultMinterName);
-        } catch (OIDCClientCredentialsMinter.OIDCClientCredentialsMinterException e) {
+            ClientCredentialsRefreshers.forName(defaultMinterName);
+        } catch (ClientCredentialsRefreshers.OIDCClientCredentialsMinterException e) {
             return;
         }
         fail("Creating minter from not existent implementation name should throw an OIDCClientCredentialsMinterException");
@@ -73,24 +73,25 @@ class OIDCClientCredentialsMinterTest {
     @Test
     void bearerHeaderExpiryScenarios() {
         Optional<LocalDateTime> someTimeInTheFuture = Optional.of(LocalDateTime.now().plusSeconds(10000));
-        var bearerHeader = new OIDCClientCredentialsMinter.BearerHeader("header", someTimeInTheFuture);
+        var bearerHeader = new ClientCredentialsRefreshers.BearerHeader("header", someTimeInTheFuture);
         assertFalse(bearerHeader.isExpired());
 
         Optional<LocalDateTime> someTimeInThePast = Optional.of(LocalDateTime.now().minusSeconds(10000));
-        bearerHeader = new OIDCClientCredentialsMinter.BearerHeader("header", someTimeInThePast);
+        bearerHeader = new ClientCredentialsRefreshers.BearerHeader("header", someTimeInThePast);
         assertTrue(bearerHeader.isExpired());
 
         Optional<LocalDateTime> noExpiryTime = Optional.empty();
-        bearerHeader = new OIDCClientCredentialsMinter.BearerHeader("header", noExpiryTime);
+        bearerHeader = new ClientCredentialsRefreshers.BearerHeader("header", noExpiryTime);
         assertTrue(bearerHeader.isExpired());
     }
 
-    static class TestMinter extends OIDCClientCredentialsMinter {
+    static class TestMinter extends ClientCredentialsRefreshers {
         public TestMinter() {
         }
 
         @Override
-        public BearerHeader authenticateAndRetrieveAuthorizationHeader(Config.OIDCClientCredentialsConfig clientConfig) throws OIDCClientCredentialsMinterException {
+        public BearerHeader authenticateAndRetrieveAuthorizationHeader(Config.OIDCClientCredentialsConfig clientConfig)
+                throws OIDCClientCredentialsMinterException {
             return null;
         }
     }
