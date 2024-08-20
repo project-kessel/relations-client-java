@@ -1,8 +1,8 @@
-package org.project_kessel.relations.client.authn.oidc.client;
+package org.project_kessel.clients.authn.oidc.client;
 
 import io.grpc.Metadata;
 import io.grpc.Status;
-import org.project_kessel.relations.client.Config;
+import org.project_kessel.clients.Config;
 
 import java.util.Optional;
 import java.util.concurrent.Executor;

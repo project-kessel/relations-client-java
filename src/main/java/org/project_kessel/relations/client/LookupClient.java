@@ -5,19 +5,16 @@ import io.grpc.stub.StreamObserver;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.operators.multi.processors.UnicastProcessor;
 import org.project_kessel.api.relations.v1beta1.*;
+import org.project_kessel.clients.KesselClient;
 
 import java.util.Iterator;
 import java.util.logging.Logger;
 
-public class LookupClient {
+public class LookupClient extends KesselClient<KesselLookupServiceGrpc.KesselLookupServiceStub,KesselLookupServiceGrpc.KesselLookupServiceBlockingStub> {
     private static final Logger logger = Logger.getLogger(LookupClient.class.getName());
 
-    private final KesselLookupServiceGrpc.KesselLookupServiceStub asyncStub;
-    private final KesselLookupServiceGrpc.KesselLookupServiceBlockingStub blockingStub;
-
     LookupClient(Channel channel) {
-        asyncStub = KesselLookupServiceGrpc.newStub(channel);
-        blockingStub = KesselLookupServiceGrpc.newBlockingStub(channel);
+        super(KesselLookupServiceGrpc.newStub(channel), KesselLookupServiceGrpc.newBlockingStub(channel));
     }
 
     public void lookupSubjects(LookupSubjectsRequest request, StreamObserver<LookupSubjectsResponse> responseObserver) {

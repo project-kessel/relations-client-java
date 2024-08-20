@@ -1,13 +1,14 @@
-package org.project_kessel.relations.client.authn.oidc.client;
+package org.project_kessel.clients.authn.oidc.client;
 
 import org.junit.jupiter.api.Test;
-import org.project_kessel.relations.client.Config;
+import org.project_kessel.clients.Config;
+import org.project_kessel.clients.authn.oidc.client.OIDCClientCredentialsMinter;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.project_kessel.relations.client.authn.oidc.client.OIDCClientCredentialsMinter.getExpiryDateFromExpiresIn;
+import static org.project_kessel.clients.authn.oidc.client.OIDCClientCredentialsMinter.getExpiryDateFromExpiresIn;
 
 class OIDCClientCredentialsMinterTest {
 

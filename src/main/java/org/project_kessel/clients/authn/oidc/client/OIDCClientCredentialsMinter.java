@@ -1,6 +1,7 @@
-package org.project_kessel.relations.client.authn.oidc.client;
+package org.project_kessel.clients.authn.oidc.client;
 
-import org.project_kessel.relations.client.Config;
+import org.project_kessel.clients.Config;
+import org.project_kessel.clients.authn.oidc.client.nimbus.NimbusOIDCClientCredentialsMinter;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -8,7 +9,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 public abstract class OIDCClientCredentialsMinter {
-    private static final Class<?> defaultMinter = org.project_kessel.relations.client.authn.oidc.client.nimbus.NimbusOIDCClientCredentialsMinter.class;
+    private static final Class<?> defaultMinter = NimbusOIDCClientCredentialsMinter.class;
 
     public static OIDCClientCredentialsMinter forDefaultImplementation() throws OIDCClientCredentialsMinterException {
         return forClass(defaultMinter);

@@ -1,11 +1,13 @@
-package org.project_kessel.relations.client.authn.oidc.client;
+package org.project_kessel.clients.authn.oidc.client;
 
 import io.grpc.CallCredentials;
 import io.grpc.Metadata;
 import io.grpc.Status;
 import io.grpc.netty.shaded.io.netty.util.concurrent.DefaultEventExecutor;
 import org.junit.jupiter.api.Test;
-import org.project_kessel.relations.client.Config;
+import org.project_kessel.clients.Config;
+import org.project_kessel.clients.authn.oidc.client.OIDCClientCredentialsCallCredentials;
+import org.project_kessel.clients.authn.oidc.client.OIDCClientCredentialsMinter;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -13,7 +15,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.project_kessel.relations.client.authn.oidc.client.OIDCClientCredentialsMinter.getDefaultMinterImplementation;
+import static org.project_kessel.clients.authn.oidc.client.OIDCClientCredentialsMinter.getDefaultMinterImplementation;
 
 public class OIDCClientCredentialsCallCredentialsTest {
 

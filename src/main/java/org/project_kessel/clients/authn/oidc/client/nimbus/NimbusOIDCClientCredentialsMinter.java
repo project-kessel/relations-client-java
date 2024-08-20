@@ -1,4 +1,4 @@
-package org.project_kessel.relations.client.authn.oidc.client.nimbus;
+package org.project_kessel.clients.authn.oidc.client.nimbus;
 
 import com.nimbusds.oauth2.sdk.*;
 import com.nimbusds.oauth2.sdk.auth.ClientAuthentication;
@@ -11,8 +11,8 @@ import com.nimbusds.openid.connect.sdk.OIDCTokenResponse;
 import com.nimbusds.openid.connect.sdk.OIDCTokenResponseParser;
 import com.nimbusds.openid.connect.sdk.op.OIDCProviderMetadata;
 import io.quarkus.runtime.annotations.RegisterForReflection;
-import org.project_kessel.relations.client.Config;
-import org.project_kessel.relations.client.authn.oidc.client.OIDCClientCredentialsMinter;
+import org.project_kessel.clients.Config;
+import org.project_kessel.clients.authn.oidc.client.OIDCClientCredentialsMinter;
 
 import java.io.IOException;
 import java.net.URI;

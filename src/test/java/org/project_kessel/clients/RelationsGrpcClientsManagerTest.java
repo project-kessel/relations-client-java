@@ -1,4 +1,4 @@
-package org.project_kessel.relations.client;
+package org.project_kessel.clients;
 
 import io.grpc.Metadata;
 import org.junit.jupiter.api.AfterAll;
@@ -9,6 +9,7 @@ import org.project_kessel.api.relations.v1beta1.KesselTupleServiceGrpc;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.project_kessel.relations.client.RelationsGrpcClientsManager;
 import org.project_kessel.relations.client.fake.GrpcServerSpy;
 
 import java.util.HashMap;
@@ -46,7 +47,7 @@ public class RelationsGrpcClientsManagerTest {
     }
 
     @Test
-    void testManagerReusePatterns() {
+    void testManagerChannelReusePatterns() {
         var one = RelationsGrpcClientsManager.forInsecureClients("localhost:8080");
         var two = RelationsGrpcClientsManager.forInsecureClients("localhost:8080"); // same as one
         var three = RelationsGrpcClientsManager.forInsecureClients("localhost1:8080");
@@ -60,10 +61,10 @@ public class RelationsGrpcClientsManagerTest {
         assertNotNull(four);
         assertNotNull(five);
         assertNotNull(six);
-        assertEquals(one, two);
-        assertNotEquals(two, three);
-        assertEquals(five, six);
-        assertNotEquals(four, five);
+        assertEquals(one.channel, two.channel);
+        assertNotEquals(two.channel, three.channel);
+        assertEquals(five.channel, six.channel);
+        assertNotEquals(four.channel, five.channel);
     }
 
     @Test
@@ -72,7 +73,7 @@ public class RelationsGrpcClientsManagerTest {
          * creating and destroying managers on different threads. */
 
         try {
-            Hashtable<String,RelationsGrpcClientsManager> managers = new Hashtable<>();
+            Hashtable<String, RelationsGrpcClientsManager> managers = new Hashtable<>();
 
             int numberOfThreads = 100;
             ExecutorService service = Executors.newFixedThreadPool(numberOfThreads);
@@ -178,12 +179,14 @@ public class RelationsGrpcClientsManagerTest {
         RelationsGrpcClientsManager.forSecureClients("localhost1:8080");
         RelationsGrpcClientsManager.forSecureClients("localhost1:8080"); // same as five
 
-        var insecureField = RelationsGrpcClientsManager.class.getDeclaredField("insecureManagers");
+        var kesselChannelManager = ChannelManager.instance();
+
+        var insecureField = ChannelManager.class.getDeclaredField("insecureManagers");
         insecureField.setAccessible(true);
-        var secureField = RelationsGrpcClientsManager.class.getDeclaredField("secureManagers");
+        var secureField = ChannelManager.class.getDeclaredField("secureManagers");
         secureField.setAccessible(true);
-        var insecureManagers = (HashMap<?,?>)insecureField.get(null);
-        var secureManagers = (HashMap<?,?>)secureField.get(null);
+        var insecureManagers = (HashMap<?,?>)insecureField.get(kesselChannelManager);
+        var secureManagers = (HashMap<?,?>)secureField.get(kesselChannelManager);
 
         assertEquals(2, insecureManagers.size());
         assertEquals(2, secureManagers.size());
@@ -196,13 +199,13 @@ public class RelationsGrpcClientsManagerTest {
         var relationTuplesClient = manager.getRelationTuplesClient();
         var lookupClient = manager.getLookupClient();
 
-        var checkAsyncStubField = CheckClient.class.getDeclaredField("asyncStub");
+        var checkAsyncStubField = KesselClient.class.getDeclaredField("asyncStub");
         checkAsyncStubField.setAccessible(true);
         var checkChannel = ((KesselCheckServiceGrpc.KesselCheckServiceStub)checkAsyncStubField.get(checkClient)).getChannel();
-        var relationTuplesAsyncStubField = RelationTuplesClient.class.getDeclaredField("asyncStub");
+        var relationTuplesAsyncStubField = KesselClient.class.getDeclaredField("asyncStub");
         relationTuplesAsyncStubField.setAccessible(true);
         var relationTuplesChannel = ((KesselTupleServiceGrpc.KesselTupleServiceStub)relationTuplesAsyncStubField.get(relationTuplesClient)).getChannel();
-        var lookupAsyncStubField = LookupClient.class.getDeclaredField("asyncStub");
+        var lookupAsyncStubField = KesselClient.class.getDeclaredField("asyncStub");
         lookupAsyncStubField.setAccessible(true);
         var lookupChannel = ((KesselLookupServiceGrpc.KesselLookupServiceStub)lookupAsyncStubField.get(lookupClient)).getChannel();
 
@@ -212,36 +215,37 @@ public class RelationsGrpcClientsManagerTest {
 
     @Test
     void testCreateAndShutdownPatternsInternal() throws Exception {
-        var insecureField = RelationsGrpcClientsManager.class.getDeclaredField("insecureManagers");
+        var kesselChannelManager = ChannelManager.instance();
+        var insecureField = ChannelManager.class.getDeclaredField("insecureManagers");
         insecureField.setAccessible(true);
-        var insecureManagersSize = ((HashMap<?,?>)insecureField.get(null)).size();
+        var insecureManagersSize = ((HashMap<?,?>)insecureField.get(kesselChannelManager)).size();
 
         assertEquals(0, insecureManagersSize);
 
         var manager = RelationsGrpcClientsManager.forInsecureClients("localhost:8080");
-        insecureManagersSize = ((HashMap<?,?>)insecureField.get(null)).size();
+        insecureManagersSize = ((HashMap<?,?>)insecureField.get(kesselChannelManager)).size();
         assertEquals(1, insecureManagersSize);
 
         RelationsGrpcClientsManager.shutdownManager(manager);
-        insecureManagersSize = ((HashMap<?,?>)insecureField.get(null)).size();
+        insecureManagersSize = ((HashMap<?,?>)insecureField.get(kesselChannelManager)).size();
         assertEquals(0, insecureManagersSize);
 
         /* Shouldn't throw exception if executed twice */
         RelationsGrpcClientsManager.shutdownManager(manager);
-        insecureManagersSize = ((HashMap<?,?>)insecureField.get(null)).size();
+        insecureManagersSize = ((HashMap<?,?>)insecureField.get(kesselChannelManager)).size();
         assertEquals(0, insecureManagersSize);
 
         var manager2 = RelationsGrpcClientsManager.forInsecureClients("localhost:8080");
-        insecureManagersSize = ((HashMap<?,?>)insecureField.get(null)).size();
+        insecureManagersSize = ((HashMap<?,?>)insecureField.get(kesselChannelManager)).size();
         assertEquals(1, insecureManagersSize);
         assertNotEquals(manager, manager2);
 
         RelationsGrpcClientsManager.forInsecureClients("localhost:8081");
-        insecureManagersSize = ((HashMap<?,?>)insecureField.get(null)).size();
+        insecureManagersSize = ((HashMap<?,?>)insecureField.get(kesselChannelManager)).size();
         assertEquals(2, insecureManagersSize);
 
         RelationsGrpcClientsManager.shutdownAll();
-        insecureManagersSize = ((HashMap<?,?>)insecureField.get(null)).size();
+        insecureManagersSize = ((HashMap<?,?>)insecureField.get(kesselChannelManager)).size();
         assertEquals(0, insecureManagersSize);
     }
 

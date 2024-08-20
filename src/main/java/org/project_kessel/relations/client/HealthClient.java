@@ -8,14 +8,14 @@ import org.project_kessel.api.relations.v1.GetLivezRequest;
 import org.project_kessel.api.relations.v1.GetReadyzResponse;
 import org.project_kessel.api.relations.v1.GetReadyzRequest;
 import org.project_kessel.api.relations.v1.KesselHealthServiceGrpc;
+import org.project_kessel.api.relations.v1beta1.KesselCheckServiceGrpc;
+import org.project_kessel.clients.KesselClient;
 
-public class HealthClient {
+public class HealthClient extends KesselClient<KesselHealthServiceGrpc.KesselHealthServiceStub, KesselHealthServiceGrpc.KesselHealthServiceBlockingStub> {
     private static final Logger logger = Logger.getLogger(HealthClient.class.getName());
 
-    private final KesselHealthServiceGrpc.KesselHealthServiceBlockingStub blockingStub;
-
     HealthClient(Channel channel) {
-        blockingStub = KesselHealthServiceGrpc.newBlockingStub(channel);
+        super(KesselHealthServiceGrpc.newStub(channel), KesselHealthServiceGrpc.newBlockingStub(channel));
     }
 
      public GetReadyzResponse readyz(GetReadyzRequest request) {

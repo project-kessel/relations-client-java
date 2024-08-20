@@ -1,12 +1,16 @@
-package org.project_kessel.relations.client;
+package org.project_kessel.clients;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
+import org.project_kessel.relations.client.CheckClient;
+import org.project_kessel.relations.client.LookupClient;
+import org.project_kessel.relations.client.RelationTuplesClient;
+import org.project_kessel.relations.client.RelationsGrpcClientsManager;
 
 /**
- * A managed bean for providing relations api clients for injection in apps.
+ * A managed bean for providing clients for injection in apps.
  * It has the current limitation that only one underlying grpc connection can be configured.
- * However, it is still possible to create more via RelationsGrpcClientsManager directly.
+ * However, it is still possible to create more via KesselClientsManager implementation directly.
  * This class does nothing unless the client is being managed by a CDI container (e.g. Quarkus)
  */
 @ApplicationScoped

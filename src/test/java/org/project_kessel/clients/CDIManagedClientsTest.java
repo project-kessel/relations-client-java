@@ -1,8 +1,9 @@
-package org.project_kessel.relations.client;
+package org.project_kessel.clients;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
+import org.project_kessel.relations.client.RelationsGrpcClientsManager;
 
 import java.util.Optional;
 

@@ -1,8 +1,8 @@
-package org.project_kessel.relations.client.authn;
+package org.project_kessel.clients.authn;
 
 import io.grpc.CallCredentials;
-import org.project_kessel.relations.client.Config;
-import org.project_kessel.relations.client.authn.oidc.client.OIDCClientCredentialsCallCredentials;
+import org.project_kessel.clients.Config;
+import org.project_kessel.clients.authn.oidc.client.OIDCClientCredentialsCallCredentials;
 
 public class CallCredentialsFactory {
 

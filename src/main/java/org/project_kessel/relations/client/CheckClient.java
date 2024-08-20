@@ -7,18 +7,15 @@ import io.grpc.Channel;
 import io.grpc.stub.StreamObserver;
 import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.operators.multi.processors.UnicastProcessor;
+import org.project_kessel.clients.KesselClient;
 
 import java.util.logging.Logger;
 
-public class CheckClient {
+public class CheckClient extends KesselClient<KesselCheckServiceGrpc.KesselCheckServiceStub, KesselCheckServiceGrpc.KesselCheckServiceBlockingStub> {
     private static final Logger logger = Logger.getLogger(CheckClient.class.getName());
 
-    private final KesselCheckServiceGrpc.KesselCheckServiceStub asyncStub;
-    private final KesselCheckServiceGrpc.KesselCheckServiceBlockingStub blockingStub;
-
     CheckClient(Channel channel) {
-        asyncStub = KesselCheckServiceGrpc.newStub(channel);
-        blockingStub = KesselCheckServiceGrpc.newBlockingStub(channel);
+        super(KesselCheckServiceGrpc.newStub(channel), KesselCheckServiceGrpc.newBlockingStub(channel));
     }
 
     public void check(CheckRequest request,
