@@ -1,11 +1,8 @@
-package org.project_kessel.clients;
+package org.project_kessel.relations.client;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
-import org.project_kessel.relations.client.CheckClient;
-import org.project_kessel.relations.client.LookupClient;
-import org.project_kessel.relations.client.RelationTuplesClient;
-import org.project_kessel.relations.client.RelationsGrpcClientsManager;
+import org.project_kessel.clients.Config;
 
 /**
  * A managed bean for providing clients for injection in apps.
@@ -14,7 +11,7 @@ import org.project_kessel.relations.client.RelationsGrpcClientsManager;
  * This class does nothing unless the client is being managed by a CDI container (e.g. Quarkus)
  */
 @ApplicationScoped
-public class CDIManagedClients {
+public class CDIManagedRelationsClients {
     @Produces
     RelationsGrpcClientsManager getManager(Config config) {
         var isSecureClients = config.isSecureClients();
