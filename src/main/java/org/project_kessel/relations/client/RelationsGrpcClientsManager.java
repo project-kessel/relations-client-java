@@ -26,14 +26,6 @@ public final class RelationsGrpcClientsManager extends KesselClientsManager {
         return new RelationsGrpcClientsManager(ChannelManager.instance().forSecureClients(targetUrl, authnConfig));
     }
 
-    public static void shutdownAll() {
-        ChannelManager.instance().shutdownAll();
-    }
-
-    public static void shutdownManager(RelationsGrpcClientsManager managerToShutdown) {
-        ChannelManager.instance().shutdownChannel(managerToShutdown.channel);
-    }
-
     public CheckClient getCheckClient() {
         return new CheckClient(channel);
     }
