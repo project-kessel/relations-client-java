@@ -1,9 +1,9 @@
 package org.project_kessel.clients.authn.oidc.client.nimbus;
 
 import org.junit.jupiter.api.Test;
-import org.project_kessel.clients.RelationsGrpcClientsManagerTest;
+import org.project_kessel.relations.client.RelationsGrpcClientsManagerTest;
 import org.project_kessel.clients.authn.oidc.client.OIDCClientCredentialsMinter;
-import org.project_kessel.relations.client.fake.FakeIdp;
+import org.project_kessel.clients.fake.FakeIdp;
 
 import static org.junit.jupiter.api.Assertions.*;
 

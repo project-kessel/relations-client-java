@@ -6,7 +6,7 @@ import org.project_kessel.clients.Config;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.project_kessel.clients.RelationsGrpcClientsManagerTest.dummyAuthConfigWithGoodOIDCClientCredentials;
+import static org.project_kessel.relations.client.RelationsGrpcClientsManagerTest.dummyAuthConfigWithGoodOIDCClientCredentials;
 
 class CallCredentialsFactoryTest {
 

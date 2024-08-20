@@ -1,4 +1,4 @@
-package org.project_kessel.clients;
+package org.project_kessel.relations.client;
 
 import io.grpc.Metadata;
 import org.junit.jupiter.api.AfterAll;
@@ -9,8 +9,10 @@ import org.project_kessel.api.relations.v1beta1.KesselTupleServiceGrpc;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.project_kessel.relations.client.RelationsGrpcClientsManager;
-import org.project_kessel.relations.client.fake.GrpcServerSpy;
+import org.project_kessel.clients.ChannelManager;
+import org.project_kessel.clients.Config;
+import org.project_kessel.clients.KesselClient;
+import org.project_kessel.clients.fake.GrpcServerSpy;
 
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -61,10 +63,10 @@ public class RelationsGrpcClientsManagerTest {
         assertNotNull(four);
         assertNotNull(five);
         assertNotNull(six);
-        assertEquals(one.channel, two.channel);
-        assertNotEquals(two.channel, three.channel);
-        assertEquals(five.channel, six.channel);
-        assertNotEquals(four.channel, five.channel);
+        assertEquals(one, two);
+        assertNotEquals(two, three);
+        assertEquals(five, six);
+        assertNotEquals(four, five);
     }
 
     @Test

@@ -1,4 +1,4 @@
-package org.project_kessel.relations.client.fake;
+package org.project_kessel.clients.fake;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;

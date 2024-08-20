@@ -1,4 +1,4 @@
-package org.project_kessel.relations.client.fake;
+package org.project_kessel.clients.fake;
 
 import io.grpc.*;
 import io.grpc.stub.StreamObserver;
