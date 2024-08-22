@@ -5,9 +5,7 @@ import io.grpc.Metadata;
 import io.grpc.Status;
 import io.grpc.netty.shaded.io.netty.util.concurrent.DefaultEventExecutor;
 import org.junit.jupiter.api.Test;
-import org.project_kessel.clients.Config;
-import org.project_kessel.clients.authn.oidc.client.OIDCClientCredentialsCallCredentials;
-import org.project_kessel.clients.authn.oidc.client.OIDCClientCredentialsMinter;
+import org.project_kessel.clients.authn.AuthenticationConfig;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -100,7 +98,7 @@ public class OIDCClientCredentialsCallCredentialsTest {
     void shouldApplyBearerMetadata() throws InterruptedException {
         var authConfig = makeAuthConfig("some", "some", "some", Optional.empty(),
                 Optional.empty());
-        var oidcClientCredentialsConfig = authConfig.clientCredentialsConfig().orElse(null);
+        var oidcClientCredentialsConfig = authConfig.clientCredentialsConfig();
         var minter = makeFakeMinter(true, 0);
         var callCreds = new OIDCClientCredentialsCallCredentials(oidcClientCredentialsConfig, minter);
         final AtomicReference<Metadata> metaDataRef = new AtomicReference<>();
@@ -119,7 +117,7 @@ public class OIDCClientCredentialsCallCredentialsTest {
     void shouldApplyPreviouslyObtainedTokenWhenInLifetime() throws InterruptedException {
         var authConfig = makeAuthConfig("some", "some", "some", Optional.empty(),
                 Optional.empty());
-        var oidcClientCredentialsConfig = authConfig.clientCredentialsConfig().orElse(null);
+        var oidcClientCredentialsConfig = authConfig.clientCredentialsConfig();
         var minter = makeFakeMinter(true, 100000); // big lifetime
         var callCreds = new OIDCClientCredentialsCallCredentials(oidcClientCredentialsConfig, minter);
         final AtomicReference<Metadata> metaDataRef = new AtomicReference<>();
@@ -145,7 +143,7 @@ public class OIDCClientCredentialsCallCredentialsTest {
     void shouldApplyNewTokenWhenOutOfLifetime() throws InterruptedException {
         var authConfig = makeAuthConfig("some", "some", "some", Optional.empty(),
                 Optional.empty());
-        var oidcClientCredentialsConfig = authConfig.clientCredentialsConfig().orElse(null);
+        var oidcClientCredentialsConfig = authConfig.clientCredentialsConfig();
         var minter = makeFakeMinter(true, 0); // zero lifetime forces new auth token
         var callCreds = new OIDCClientCredentialsCallCredentials(oidcClientCredentialsConfig, minter);
         final AtomicReference<Metadata> metaDataRef = new AtomicReference<>();
@@ -171,7 +169,7 @@ public class OIDCClientCredentialsCallCredentialsTest {
     void shouldApplyUnauthenticatedWhenAuthnFails() throws InterruptedException {
         var authConfig = makeAuthConfig("some", "some", "some", Optional.empty(),
                 Optional.empty());
-        var oidcClientCredentialsConfig = authConfig.clientCredentialsConfig().orElse(null);
+        var oidcClientCredentialsConfig = authConfig.clientCredentialsConfig();
         var minter = makeFakeMinter(false, 0);
         var callCreds = new OIDCClientCredentialsCallCredentials(oidcClientCredentialsConfig, minter);
         final AtomicReference<Metadata> metaDataRef = new AtomicReference<>();
@@ -191,7 +189,7 @@ public class OIDCClientCredentialsCallCredentialsTest {
             int mintedNumber = 0;
 
             @Override
-            public BearerHeader authenticateAndRetrieveAuthorizationHeader(Config.OIDCClientCredentialsConfig clientConfig) throws OIDCClientCredentialsMinterException {
+            public BearerHeader authenticateAndRetrieveAuthorizationHeader(OIDCClientCredentialsAuthenticationConfig.OIDCClientCredentialsConfig clientConfig) throws OIDCClientCredentialsMinterException {
                 if (!alwaysSucceedsOrFails) {
                     throw new OIDCClientCredentialsMinterException("Authentication failed.");
                 }
@@ -218,46 +216,22 @@ public class OIDCClientCredentialsCallCredentialsTest {
         };
     }
 
-    public static Config.AuthenticationConfig makeAuthConfig(String issuer, String clientId, String clientSecret) {
+    public static OIDCClientCredentialsAuthenticationConfig makeAuthConfig(String issuer, String clientId, String clientSecret) {
         return makeAuthConfig(issuer, clientId, clientSecret, Optional.empty(), Optional.empty());
     }
 
-    public static Config.AuthenticationConfig makeAuthConfig(String issuer, String clientId, String clientSecret, Optional<String[]> scope, Optional<String> minterImpl) {
-        return new Config.AuthenticationConfig() {
-            @Override
-            public Config.AuthMode mode() {
-                return null;
-            }
+    public static OIDCClientCredentialsAuthenticationConfig makeAuthConfig(String issuer, String clientId, String clientSecret, Optional<String[]> scope, Optional<String> minterImpl) {
+        var oidcClientCredentialsConfig = new OIDCClientCredentialsAuthenticationConfig.OIDCClientCredentialsConfig();
+        oidcClientCredentialsConfig.setIssuer(issuer);
+        oidcClientCredentialsConfig.setClientId(clientId);
+        oidcClientCredentialsConfig.setClientSecret(clientSecret);
+        oidcClientCredentialsConfig.setScope(scope);
+        oidcClientCredentialsConfig.setOidcClientCredentialsMinterImplementation(minterImpl);
 
-            @Override
-            public Optional<Config.OIDCClientCredentialsConfig> clientCredentialsConfig() {
-                return Optional.of(new Config.OIDCClientCredentialsConfig() {
-                    @Override
-                    public String issuer() {
-                        return issuer;
-                    }
+        var authnConfig = new OIDCClientCredentialsAuthenticationConfig();
+        authnConfig.setMode(null);
+        authnConfig.setCredentialsConfig(oidcClientCredentialsConfig);
 
-                    @Override
-                    public String clientId() {
-                        return clientId;
-                    }
-
-                    @Override
-                    public String clientSecret() {
-                        return clientSecret;
-                    }
-
-                    @Override
-                    public Optional<String[]> scope() {
-                        return scope;
-                    }
-
-                    @Override
-                    public Optional<String> oidcClientCredentialsMinterImplementation() {
-                        return minterImpl;
-                    }
-                });
-            }
-        };
+        return authnConfig;
     }
 }

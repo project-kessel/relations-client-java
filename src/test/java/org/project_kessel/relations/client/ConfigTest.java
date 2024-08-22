@@ -1,4 +1,4 @@
-package org.project_kessel.clients;
+package org.project_kessel.relations.client;
 
 import io.smallrye.config.SmallRyeConfigBuilder;
 

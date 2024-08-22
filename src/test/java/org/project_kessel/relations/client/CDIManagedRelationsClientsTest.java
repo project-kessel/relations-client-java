@@ -3,7 +3,7 @@ package org.project_kessel.relations.client;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.project_kessel.clients.Config;
+import org.project_kessel.clients.authn.AuthenticationConfig;
 
 import java.util.Optional;
 
@@ -136,12 +136,12 @@ class CDIManagedRelationsClientsTest {
     static Config.AuthenticationConfig makeDummyAuthenticationConfig(boolean authnEnabled) {
         return new Config.AuthenticationConfig() {
             @Override
-            public Config.AuthMode mode() {
+            public AuthenticationConfig.AuthMode mode() {
                 if(!authnEnabled) {
-                    return Config.AuthMode.DISABLED;
+                    return AuthenticationConfig.AuthMode.DISABLED;
                 }
                 // pick some arbitrary non disabled mode
-                return Config.AuthMode.OIDC_CLIENT_CREDENTIALS;
+                return AuthenticationConfig.AuthMode.OIDC_CLIENT_CREDENTIALS;
             }
 
             @Override

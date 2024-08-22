@@ -1,6 +1,5 @@
 package org.project_kessel.clients.authn.oidc.client;
 
-import org.project_kessel.clients.Config;
 import org.project_kessel.clients.authn.oidc.client.nimbus.NimbusOIDCClientCredentialsMinter;
 
 import java.lang.reflect.Constructor;
@@ -33,7 +32,7 @@ public abstract class OIDCClientCredentialsMinter {
         }
     }
 
-    public abstract BearerHeader authenticateAndRetrieveAuthorizationHeader(Config.OIDCClientCredentialsConfig clientConfig) throws OIDCClientCredentialsMinterException;
+    public abstract BearerHeader authenticateAndRetrieveAuthorizationHeader(OIDCClientCredentialsAuthenticationConfig.OIDCClientCredentialsConfig clientConfig) throws OIDCClientCredentialsMinterException;
 
     public static class BearerHeader {
         private final String authorizationHeader;

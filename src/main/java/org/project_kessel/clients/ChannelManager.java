@@ -1,6 +1,7 @@
 package org.project_kessel.clients;
 
 import io.grpc.*;
+import org.project_kessel.clients.authn.AuthenticationConfig;
 import org.project_kessel.clients.authn.CallCredentialsFactory;
 
 import java.util.HashMap;
@@ -27,7 +28,7 @@ public final class ChannelManager {
         return insecureManagers.get(targetUrl);
     }
 
-    public synchronized Channel forInsecureClients(String targetUrl, Config.AuthenticationConfig authnConfig) throws RuntimeException {
+    public synchronized Channel forInsecureClients(String targetUrl, AuthenticationConfig authnConfig) throws RuntimeException {
         if (!insecureManagers.containsKey(targetUrl)) {
             try {
                 var channel = Grpc.newChannelBuilder(targetUrl,
@@ -49,7 +50,7 @@ public final class ChannelManager {
         return secureManagers.get(targetUrl);
     }
 
-    public synchronized Channel forSecureClients(String targetUrl, Config.AuthenticationConfig authnConfig) {
+    public synchronized Channel forSecureClients(String targetUrl, AuthenticationConfig authnConfig) {
         if (!secureManagers.containsKey(targetUrl)) {
             var tlsChannelCredentials = TlsChannelCredentials.create();
             try {

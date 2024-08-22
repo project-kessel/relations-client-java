@@ -11,7 +11,7 @@ import com.nimbusds.openid.connect.sdk.OIDCTokenResponse;
 import com.nimbusds.openid.connect.sdk.OIDCTokenResponseParser;
 import com.nimbusds.openid.connect.sdk.op.OIDCProviderMetadata;
 import io.quarkus.runtime.annotations.RegisterForReflection;
-import org.project_kessel.clients.Config;
+import org.project_kessel.clients.authn.oidc.client.OIDCClientCredentialsAuthenticationConfig;
 import org.project_kessel.clients.authn.oidc.client.OIDCClientCredentialsMinter;
 
 import java.io.IOException;
@@ -25,7 +25,7 @@ import java.util.Optional;
 @RegisterForReflection
 public class NimbusOIDCClientCredentialsMinter extends OIDCClientCredentialsMinter {
     @Override
-    public BearerHeader authenticateAndRetrieveAuthorizationHeader(Config.OIDCClientCredentialsConfig config) throws OIDCClientCredentialsMinterException {
+    public BearerHeader authenticateAndRetrieveAuthorizationHeader(OIDCClientCredentialsAuthenticationConfig.OIDCClientCredentialsConfig config) throws OIDCClientCredentialsMinterException {
         Issuer issuer = new Issuer(config.issuer());
         ClientID clientID = new ClientID(config.clientId());
         Secret clientSecret = new Secret(config.clientSecret());

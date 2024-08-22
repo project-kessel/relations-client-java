@@ -1,18 +1,16 @@
 package org.project_kessel.clients.authn;
 
 import org.junit.jupiter.api.Test;
-import org.project_kessel.clients.Config;
+import org.project_kessel.clients.authn.oidc.client.OIDCClientCredentialsAuthenticationConfig;
 
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.project_kessel.relations.client.RelationsGrpcClientsManagerTest.dummyAuthConfigWithGoodOIDCClientCredentials;
 
-class CallCredentialsFactoryTest {
-
+public class CallCredentialsFactoryTest {
     @Test
     void testCreateOIDCClientCallCredentials() {
-        Config.AuthenticationConfig authnConfig = dummyAuthConfigWithGoodOIDCClientCredentials();
+        AuthenticationConfig authnConfig = dummyAuthConfigWithGoodOIDCClientCredentials();
         try {
             CallCredentialsFactory.create(authnConfig);
         } catch (CallCredentialsFactory.CallCredentialsCreationException e) {
@@ -22,7 +20,7 @@ class CallCredentialsFactoryTest {
 
     @Test
     void testFailToCreateCallCredentialsWhenAuthnConfigEmpty() {
-        Config.AuthenticationConfig authnConfig = null;
+        AuthenticationConfig authnConfig = null;
         try {
             CallCredentialsFactory.create(authnConfig);
             fail("CallCredentialsFactory creation for OIDC client should throw an exception when OIDC client config is empty.");
@@ -32,17 +30,8 @@ class CallCredentialsFactoryTest {
 
     @Test
     void testFailToCreateCallCredentialsForOIDCWhenConfigEmpty() {
-        Config.AuthenticationConfig authnConfig = new Config.AuthenticationConfig() {
-            @Override
-            public Config.AuthMode mode() {
-                return Config.AuthMode.OIDC_CLIENT_CREDENTIALS;
-            }
-
-            @Override
-            public Optional<Config.OIDCClientCredentialsConfig> clientCredentialsConfig() {
-                return Optional.empty();
-            }
-        };
+        var authnConfig = new OIDCClientCredentialsAuthenticationConfig();
+        authnConfig.setMode(AuthenticationConfig.AuthMode.OIDC_CLIENT_CREDENTIALS);
         try {
             CallCredentialsFactory.create(authnConfig);
             fail("CallCredentialsFactory creation for OIDC client should throw an exception when OIDC client config is empty.");
@@ -50,4 +39,18 @@ class CallCredentialsFactoryTest {
         }
     }
 
+    public static OIDCClientCredentialsAuthenticationConfig dummyAuthConfigWithGoodOIDCClientCredentials() {
+        var oidcClientCredentialsConfig = new OIDCClientCredentialsAuthenticationConfig.OIDCClientCredentialsConfig();
+        oidcClientCredentialsConfig.setIssuer("http://localhost:8090");
+        oidcClientCredentialsConfig.setClientId("test");
+        oidcClientCredentialsConfig.setClientSecret("test");
+        oidcClientCredentialsConfig.setScope(Optional.empty());
+        oidcClientCredentialsConfig.setOidcClientCredentialsMinterImplementation(Optional.empty());
+
+        var authnConfig = new OIDCClientCredentialsAuthenticationConfig();
+        authnConfig.setMode(AuthenticationConfig.AuthMode.OIDC_CLIENT_CREDENTIALS);
+        authnConfig.setCredentialsConfig(oidcClientCredentialsConfig);
+
+        return authnConfig;
+    }
 }

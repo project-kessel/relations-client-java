@@ -1,4 +1,4 @@
-package org.project_kessel.relations.client.util;
+package org.project_kessel.clients.util;
 
 import java.io.*;
 import java.security.*;

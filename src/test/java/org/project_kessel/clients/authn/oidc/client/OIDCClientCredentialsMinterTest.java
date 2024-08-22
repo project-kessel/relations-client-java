@@ -1,8 +1,6 @@
 package org.project_kessel.clients.authn.oidc.client;
 
 import org.junit.jupiter.api.Test;
-import org.project_kessel.clients.Config;
-import org.project_kessel.clients.authn.oidc.client.OIDCClientCredentialsMinter;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -91,7 +89,7 @@ class OIDCClientCredentialsMinterTest {
         }
 
         @Override
-        public BearerHeader authenticateAndRetrieveAuthorizationHeader(Config.OIDCClientCredentialsConfig clientConfig) throws OIDCClientCredentialsMinterException {
+        public BearerHeader authenticateAndRetrieveAuthorizationHeader(OIDCClientCredentialsAuthenticationConfig.OIDCClientCredentialsConfig clientConfig) throws OIDCClientCredentialsMinterException {
             return null;
         }
     }

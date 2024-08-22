@@ -1,7 +1,6 @@
 package org.project_kessel.clients.authn;
 
 import io.grpc.CallCredentials;
-import org.project_kessel.clients.Config;
 import org.project_kessel.clients.authn.oidc.client.OIDCClientCredentialsCallCredentials;
 
 public class CallCredentialsFactory {
@@ -10,7 +9,7 @@ public class CallCredentialsFactory {
 
     }
 
-    public static CallCredentials create(Config.AuthenticationConfig authnConfig) throws CallCredentialsCreationException {
+    public static CallCredentials create(AuthenticationConfig authnConfig) throws CallCredentialsCreationException {
         if (authnConfig == null) {
             throw new CallCredentialsCreationException("AuthenticationConfig is required to create CallCredentials and must not be null.");
         }

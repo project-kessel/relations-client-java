@@ -10,8 +10,10 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.project_kessel.clients.ChannelManager;
-import org.project_kessel.clients.Config;
 import org.project_kessel.clients.KesselClient;
+import org.project_kessel.clients.authn.AuthenticationConfig;
+import org.project_kessel.clients.authn.CallCredentialsFactoryTest;
+import org.project_kessel.clients.authn.oidc.client.OIDCClientCredentialsAuthenticationConfig;
 import org.project_kessel.clients.fake.GrpcServerSpy;
 
 import java.util.HashMap;
@@ -23,7 +25,7 @@ import java.util.concurrent.Executors;
 
 import static io.smallrye.common.constraint.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.project_kessel.relations.client.util.CertUtil.*;
+import static org.project_kessel.clients.util.CertUtil.*;
 
 public class RelationsGrpcClientsManagerTest {
     private static final Metadata.Key<String> authorizationKey = Metadata.Key.of("Authorization", Metadata.ASCII_STRING_MARSHALLER);
@@ -254,8 +256,8 @@ public class RelationsGrpcClientsManagerTest {
     public static Config.AuthenticationConfig dummyAuthConfigWithGoodOIDCClientCredentials() {
         return new Config.AuthenticationConfig() {
             @Override
-            public Config.AuthMode mode() {
-                return Config.AuthMode.OIDC_CLIENT_CREDENTIALS; // any non-disabled value
+            public AuthenticationConfig.AuthMode mode() {
+                return AuthenticationConfig.AuthMode.OIDC_CLIENT_CREDENTIALS; // any non-disabled value
             }
 
             @Override

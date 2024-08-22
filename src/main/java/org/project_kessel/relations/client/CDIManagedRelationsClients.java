@@ -2,7 +2,7 @@ package org.project_kessel.relations.client;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
-import org.project_kessel.clients.Config;
+import org.project_kessel.clients.authn.AuthenticationConfig.AuthMode;
 
 /**
  * A managed bean for providing clients for injection in apps.
@@ -16,7 +16,7 @@ public class CDIManagedRelationsClients {
     RelationsGrpcClientsManager getManager(Config config) {
         var isSecureClients = config.isSecureClients();
         var targetUrl = config.targetUrl();
-        var authnEnabled = config.authenticationConfig().map(t -> !t.mode().equals(Config.AuthMode.DISABLED)).orElse(false);
+        var authnEnabled = config.authenticationConfig().map(t -> !t.mode().equals(AuthMode.DISABLED)).orElse(false);
 
         if (isSecureClients) {
             if(authnEnabled) {
