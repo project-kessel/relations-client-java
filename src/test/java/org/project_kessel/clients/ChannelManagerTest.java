@@ -100,13 +100,13 @@ class ChannelManagerTest {
             for (int i = 0; i < numberOfThreads / 3; i++) {
                 final int j = i;
                 service.submit(() -> {
-                    Channel manager;
+                    Channel channel;
                     if(j % 2 == 0) {
-                        manager = defaultChannelManager.forInsecureClients("localhost" + j);
+                        channel = defaultChannelManager.forInsecureClients("localhost" + j);
                     } else {
-                        manager = defaultChannelManager.forSecureClients("localhost" + j);
+                        channel = defaultChannelManager.forSecureClients("localhost" + j);
                     }
-                    channels.put("localhost" + j, manager);
+                    channels.put("localhost" + j, channel);
 
                     latch1.countDown();
                 });
@@ -128,13 +128,13 @@ class ChannelManagerTest {
             for (int i = numberOfThreads * 2 / 3; i < numberOfThreads; i++) {
                 final int j = i - numberOfThreads * 2 / 3;
                 service.submit(() -> {
-                    Channel manager;
+                    Channel channel;
                     if(j % 2 == 0) {
-                        manager = defaultChannelManager.forInsecureClients("localhost" + j);
+                        channel = defaultChannelManager.forInsecureClients("localhost" + j);
                     } else {
-                        manager = defaultChannelManager.forSecureClients("localhost" + j);
+                        channel = defaultChannelManager.forSecureClients("localhost" + j);
                     }
-                    channels.put("localhost" + j, manager);
+                    channels.put("localhost" + j, channel);
 
                     latch3.countDown();
                 });
@@ -159,49 +159,49 @@ class ChannelManagerTest {
         defaultChannelManager.forSecureClients("localhost1:8080");
         defaultChannelManager.forSecureClients("localhost1:8080"); // same as five
 
-        var insecureField = ChannelManager.class.getDeclaredField("insecureManagers");
+        var insecureField = ChannelManager.class.getDeclaredField("insecureChannels");
         insecureField.setAccessible(true);
-        var secureField = ChannelManager.class.getDeclaredField("secureManagers");
+        var secureField = ChannelManager.class.getDeclaredField("secureChannels");
         secureField.setAccessible(true);
-        var insecureManagers = (HashMap<?,?>)insecureField.get(defaultChannelManager);
-        var secureManagers = (HashMap<?,?>)secureField.get(defaultChannelManager);
+        var insecureChannels = (HashMap<?,?>)insecureField.get(defaultChannelManager);
+        var secureChannels = (HashMap<?,?>)secureField.get(defaultChannelManager);
 
-        assertEquals(2, insecureManagers.size());
-        assertEquals(2, secureManagers.size());
+        assertEquals(2, insecureChannels.size());
+        assertEquals(2, secureChannels.size());
     }
 
     @Test
     void testCreateAndShutdownPatternsInternal() throws Exception {
-        var insecureField = ChannelManager.class.getDeclaredField("insecureManagers");
+        var insecureField = ChannelManager.class.getDeclaredField("insecureChannels");
         insecureField.setAccessible(true);
-        var insecureManagersSize = ((HashMap<?,?>)insecureField.get(defaultChannelManager)).size();
+        var insecureChannelsSize = ((HashMap<?,?>)insecureField.get(defaultChannelManager)).size();
 
-        assertEquals(0, insecureManagersSize);
+        assertEquals(0, insecureChannelsSize);
 
         var channel = defaultChannelManager.forInsecureClients("localhost:8080");
-        insecureManagersSize = ((HashMap<?,?>)insecureField.get(defaultChannelManager)).size();
-        assertEquals(1, insecureManagersSize);
+        insecureChannelsSize = ((HashMap<?,?>)insecureField.get(defaultChannelManager)).size();
+        assertEquals(1, insecureChannelsSize);
 
         defaultChannelManager.shutdownChannel(channel);
-        insecureManagersSize = ((HashMap<?,?>)insecureField.get(defaultChannelManager)).size();
-        assertEquals(0, insecureManagersSize);
+        insecureChannelsSize = ((HashMap<?,?>)insecureField.get(defaultChannelManager)).size();
+        assertEquals(0, insecureChannelsSize);
 
         /* Shouldn't throw exception if executed twice */
         defaultChannelManager.shutdownChannel(channel);
-        insecureManagersSize = ((HashMap<?,?>)insecureField.get(defaultChannelManager)).size();
-        assertEquals(0, insecureManagersSize);
+        insecureChannelsSize = ((HashMap<?,?>)insecureField.get(defaultChannelManager)).size();
+        assertEquals(0, insecureChannelsSize);
 
-        var manager2 = defaultChannelManager.forInsecureClients("localhost:8080");
-        insecureManagersSize = ((HashMap<?,?>)insecureField.get(defaultChannelManager)).size();
-        assertEquals(1, insecureManagersSize);
-        assertNotEquals(channel, manager2);
+        var channel2 = defaultChannelManager.forInsecureClients("localhost:8080");
+        insecureChannelsSize = ((HashMap<?,?>)insecureField.get(defaultChannelManager)).size();
+        assertEquals(1, insecureChannelsSize);
+        assertNotEquals(channel, channel2);
 
         defaultChannelManager.forInsecureClients("localhost:8081");
-        insecureManagersSize = ((HashMap<?,?>)insecureField.get(defaultChannelManager)).size();
-        assertEquals(2, insecureManagersSize);
+        insecureChannelsSize = ((HashMap<?,?>)insecureField.get(defaultChannelManager)).size();
+        assertEquals(2, insecureChannelsSize);
 
         defaultChannelManager.shutdownAll();
-        insecureManagersSize = ((HashMap<?,?>)insecureField.get(defaultChannelManager)).size();
-        assertEquals(0, insecureManagersSize);
+        insecureChannelsSize = ((HashMap<?,?>)insecureField.get(defaultChannelManager)).size();
+        assertEquals(0, insecureChannelsSize);
     }
 }
