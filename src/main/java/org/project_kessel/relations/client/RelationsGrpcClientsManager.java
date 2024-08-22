@@ -9,20 +9,30 @@ public final class RelationsGrpcClientsManager extends KesselClientsManager {
         super(channel);
     }
 
+    private static final String CHANNEL_MANAGER_KEY = RelationsGrpcClientsManager.class.getName();
+
     public static RelationsGrpcClientsManager forInsecureClients(String targetUrl) {
-        return new RelationsGrpcClientsManager(ChannelManager.instance().forInsecureClients(targetUrl));
+        return new RelationsGrpcClientsManager(ChannelManager.getInstance(CHANNEL_MANAGER_KEY).forInsecureClients(targetUrl));
     }
 
     public static RelationsGrpcClientsManager forInsecureClients(String targetUrl, Config.AuthenticationConfig authnConfig) throws RuntimeException {
-        return new RelationsGrpcClientsManager(ChannelManager.instance().forInsecureClients(targetUrl, AuthnConfigConverter.convert(authnConfig)));
+        return new RelationsGrpcClientsManager(ChannelManager.getInstance(CHANNEL_MANAGER_KEY).forInsecureClients(targetUrl, AuthnConfigConverter.convert(authnConfig)));
     }
 
     public static RelationsGrpcClientsManager forSecureClients(String targetUrl) {
-        return new RelationsGrpcClientsManager(ChannelManager.instance().forSecureClients(targetUrl));
+        return new RelationsGrpcClientsManager(ChannelManager.getInstance(CHANNEL_MANAGER_KEY).forSecureClients(targetUrl));
     }
 
     public static RelationsGrpcClientsManager forSecureClients(String targetUrl, Config.AuthenticationConfig authnConfig) {
-        return new RelationsGrpcClientsManager(ChannelManager.instance().forSecureClients(targetUrl, AuthnConfigConverter.convert(authnConfig)));
+        return new RelationsGrpcClientsManager(ChannelManager.getInstance(CHANNEL_MANAGER_KEY).forSecureClients(targetUrl, AuthnConfigConverter.convert(authnConfig)));
+    }
+
+    public static void shutdownAll() {
+        ChannelManager.getInstance(CHANNEL_MANAGER_KEY).shutdownAll();
+    }
+
+    public static void shutdownManager(RelationsGrpcClientsManager managerToShutdown) {
+        ChannelManager.getInstance(CHANNEL_MANAGER_KEY).shutdownChannel(managerToShutdown.channel);
     }
 
     public CheckClient getCheckClient() {

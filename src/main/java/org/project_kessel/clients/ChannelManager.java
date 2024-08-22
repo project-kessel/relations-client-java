@@ -5,19 +5,25 @@ import org.project_kessel.clients.authn.AuthenticationConfig;
 import org.project_kessel.clients.authn.CallCredentialsFactory;
 
 import java.util.HashMap;
+import java.util.Hashtable;
 
 public final class ChannelManager {
     private static ChannelManager channelManager;
 
+    /* In the scenario where multiple clients are using this library, we need to support multiple channel managers,
+    * so that clients can use separate channels. There may also be scenarios where reusing the same channel manager, and
+    * hence channels, may be desirable. */
+    private static final Hashtable<String,ChannelManager> channelManagers = new Hashtable<>();
+
     private final HashMap<String, ManagedChannel> insecureManagers = new HashMap<>();
     private final HashMap<String, ManagedChannel> secureManagers = new HashMap<>();
 
-    public static ChannelManager instance() {
-        if(channelManager == null) {
-             channelManager = new ChannelManager();
+    public static ChannelManager getInstance(String channelManagerKey) {
+        if(!channelManagers.containsKey(channelManagerKey)) {
+            channelManagers.put(channelManagerKey, new ChannelManager());
         }
 
-        return channelManager;
+        return channelManagers.get(channelManagerKey);
     }
 
     public synchronized Channel forInsecureClients(String targetUrl) {

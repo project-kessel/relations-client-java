@@ -12,8 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.project_kessel.clients.ChannelManager;
 import org.project_kessel.clients.KesselClient;
 import org.project_kessel.clients.authn.AuthenticationConfig;
-import org.project_kessel.clients.authn.CallCredentialsFactoryTest;
-import org.project_kessel.clients.authn.oidc.client.OIDCClientCredentialsAuthenticationConfig;
 import org.project_kessel.clients.fake.GrpcServerSpy;
 
 import java.util.HashMap;
@@ -171,7 +169,7 @@ public class RelationsGrpcClientsManagerTest {
     }
 
     /*
-     Tests relying on reflection. Maybe be brittle and could be removed in future.
+     Tests relying on reflection. Brittle and could be removed in future.
      */
 
     @Test
@@ -183,7 +181,10 @@ public class RelationsGrpcClientsManagerTest {
         RelationsGrpcClientsManager.forSecureClients("localhost1:8080");
         RelationsGrpcClientsManager.forSecureClients("localhost1:8080"); // same as five
 
-        var kesselChannelManager = ChannelManager.instance();
+        var channelManagerKeyField = RelationsGrpcClientsManager.class.getDeclaredField("CHANNEL_MANAGER_KEY");
+        channelManagerKeyField.setAccessible(true);
+        var channelManagerKey = (String)channelManagerKeyField.get(null);
+        var kesselChannelManager = ChannelManager.getInstance(channelManagerKey);
 
         var insecureField = ChannelManager.class.getDeclaredField("insecureManagers");
         insecureField.setAccessible(true);
@@ -219,7 +220,11 @@ public class RelationsGrpcClientsManagerTest {
 
     @Test
     void testCreateAndShutdownPatternsInternal() throws Exception {
-        var kesselChannelManager = ChannelManager.instance();
+        var channelManagerKeyField = RelationsGrpcClientsManager.class.getDeclaredField("CHANNEL_MANAGER_KEY");
+        channelManagerKeyField.setAccessible(true);
+        var channelManagerKey = (String)channelManagerKeyField.get(null);
+        var kesselChannelManager = ChannelManager.getInstance(channelManagerKey);
+
         var insecureField = ChannelManager.class.getDeclaredField("insecureManagers");
         insecureField.setAccessible(true);
         var insecureManagersSize = ((HashMap<?,?>)insecureField.get(kesselChannelManager)).size();

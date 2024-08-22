@@ -9,14 +9,6 @@ public abstract class KesselClientsManager {
         this.channel = channel;
     }
 
-    public static void shutdownAll() {
-        ChannelManager.instance().shutdownAll();
-    }
-
-    public static void shutdownManager(KesselClientsManager managerToShutdown) {
-        ChannelManager.instance().shutdownChannel(managerToShutdown.channel);
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
