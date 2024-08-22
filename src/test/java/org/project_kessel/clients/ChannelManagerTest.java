@@ -15,11 +15,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ChannelManagerTest {
     ChannelManager defaultChannelManager = ChannelManager.getInstance("defaultChannelManager");
+    ChannelManager otherChannelManager = ChannelManager.getInstance("otherChannelManager");
 
     @AfterEach
     void testTeardown() {
         /* Make sure all client managers shutdown/removed after each test */
         defaultChannelManager.shutdownAll();
+        otherChannelManager.shutdownAll();
     }
 
     @Test
@@ -56,6 +58,27 @@ class ChannelManagerTest {
         assertEquals(one, two);
         assertNotEquals(two, three);
         assertEquals(five, six);
+        assertNotEquals(four, five);
+    }
+
+    @Test
+    void testManagerChannelReusePatternsAcrossChannelManagers() {
+        var one = defaultChannelManager.forInsecureClients("localhost:8080");
+        var two = defaultChannelManager.forInsecureClients("localhost:8080"); // same as one
+        var three = otherChannelManager.forInsecureClients("localhost1:8080");
+        var four = otherChannelManager.forSecureClients("localhost:8080");
+        var five = otherChannelManager.forSecureClients("localhost1:8080");
+        var six = defaultChannelManager.forSecureClients("localhost1:8080"); // same as five but different manager
+
+        assertNotNull(one);
+        assertNotNull(two);
+        assertNotNull(three);
+        assertNotNull(four);
+        assertNotNull(five);
+        assertNotNull(six);
+        assertEquals(one, two);
+        assertNotEquals(two, three);
+        assertNotEquals(five, six);
         assertNotEquals(four, five);
     }
 
