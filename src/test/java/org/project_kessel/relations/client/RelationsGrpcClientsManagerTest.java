@@ -1,23 +1,15 @@
 package org.project_kessel.relations.client;
 
-import io.grpc.Metadata;
-import org.junit.jupiter.api.AfterAll;
-import org.project_kessel.api.relations.v1beta1.CheckRequest;
 import org.project_kessel.api.relations.v1beta1.KesselCheckServiceGrpc;
 import org.project_kessel.api.relations.v1beta1.KesselLookupServiceGrpc;
 import org.project_kessel.api.relations.v1beta1.KesselTupleServiceGrpc;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.project_kessel.clients.KesselClient;
 import org.project_kessel.clients.authn.AuthenticationConfig;
-import org.project_kessel.clients.fake.GrpcServerSpy;
 
 import java.util.Optional;
 
-import static io.smallrye.common.constraint.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.project_kessel.clients.util.CertUtil.*;
 
 public class RelationsGrpcClientsManagerTest {
     /*
