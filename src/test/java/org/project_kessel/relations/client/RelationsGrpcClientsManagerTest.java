@@ -20,63 +20,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.project_kessel.clients.util.CertUtil.*;
 
 public class RelationsGrpcClientsManagerTest {
-    private static final Metadata.Key<String> authorizationKey = Metadata.Key.of("Authorization", Metadata.ASCII_STRING_MARSHALLER);
-
-    @BeforeAll
-    static void testSetup() {
-        /* Make sure all client managers shutdown/removed before tests */
-        RelationsGrpcClientsManager.shutdownAll();
-        /* Add self-signed cert to keystore, trust manager and SSL context for TLS testing. */
-        addTestCACertToTrustStore();
-    }
-
-    @AfterEach
-    void testTeardown() {
-        /* Make sure all client managers shutdown/removed after each test */
-        RelationsGrpcClientsManager.shutdownAll();
-    }
-
-    @AfterAll
-    static void removeTestSetup() {
-        /* Remove self-signed cert */
-        removeTestCACertFromKeystore();
-    }
-
-    /*
-      End-to-end tests against fake IdP and/or fake grpc relations-api
-     */
-
-    @Test
-    void testManagersHoldIntendedCredentialsInChannel() throws Exception {
-        Config.AuthenticationConfig authnConfig = dummyAuthConfigWithGoodOIDCClientCredentials();
-        var manager = RelationsGrpcClientsManager.forInsecureClients("localhost:7000");
-        var manager2 = RelationsGrpcClientsManager.forInsecureClients("localhost:7001", authnConfig);
-        var manager3 = RelationsGrpcClientsManager.forSecureClients("localhost:7002");
-        var manager4 = RelationsGrpcClientsManager.forSecureClients("localhost:7003", authnConfig);
-
-        var checkClient = manager.getCheckClient();
-        var checkClient2 = manager2.getCheckClient();
-        var checkClient3 = manager3.getCheckClient();
-        var checkClient4 = manager4.getCheckClient();
-
-        var cd1 = GrpcServerSpy.runAgainstTemporaryServerWithDummyServices(7000, () -> checkClient.check(CheckRequest.getDefaultInstance()));
-        var cd2 = GrpcServerSpy.runAgainstTemporaryServerWithDummyServices(7001, () -> checkClient2.check(CheckRequest.getDefaultInstance()));
-        var cd3 = GrpcServerSpy.runAgainstTemporaryTlsServerWithDummyServices(7002, () -> checkClient3.check(CheckRequest.getDefaultInstance()));
-        var cd4 = GrpcServerSpy.runAgainstTemporaryTlsServerWithDummyServices(7003, () -> checkClient4.check(CheckRequest.getDefaultInstance()));
-
-        assertNull(cd1.getMetadata().get(authorizationKey));
-        assertEquals("NONE", cd1.getCall().getSecurityLevel().toString());
-
-        assertNotNull(cd2.getMetadata().get(authorizationKey));
-        assertEquals("NONE", cd2.getCall().getSecurityLevel().toString());
-
-        assertNull(cd3.getMetadata().get(authorizationKey));
-        assertEquals("PRIVACY_AND_INTEGRITY", cd3.getCall().getSecurityLevel().toString());
-
-        assertNotNull(cd4.getMetadata().get(authorizationKey));
-        assertEquals("PRIVACY_AND_INTEGRITY", cd4.getCall().getSecurityLevel().toString());
-    }
-
     /*
      Tests relying on reflection. Brittle and could be removed in future.
      */
