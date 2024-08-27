@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.Hashtable;
 
 public final class ChannelManager {
-    private static ChannelManager channelManager;
 
     /* In the scenario where multiple clients are using this library, we need to support multiple channel managers,
     * so that clients can use separate channels. There may also be scenarios where reusing the same channel manager, and
