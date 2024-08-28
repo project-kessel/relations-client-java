@@ -1,8 +1,9 @@
 name: sync-protos
 
 on:
+  workflow_dispatch:
   schedule:
-    - cron: '0 */1 * * *' # every hour.
+    - cron: '0 */6 * * *' # every 6 hours.
 
 
 jobs:
@@ -12,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Clone relations-api repo
-        run: git clone https://github.com/project-kessel/relations-api.git
+        run: git clone --depth=1 https://github.com/project-kessel/relations-api.git
       - name: Copy proto files
         run: |
           cp -r relations-api/api/kessel/relations/v1/*.proto src/main/proto/kessel/relations/v1/
