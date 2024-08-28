@@ -1,0 +1,25 @@
+name: sync-protos
+
+on:
+  schedule:
+    - cron: '0 */1 * * *' # every hour.
+
+
+jobs:
+  build:
+    name: Sync protos to clients
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Clone relations-api repo
+        run: git clone https://github.com/project-kessel/relations-api.git
+      - name: Copy proto files
+        run: |
+          cp -r relations-api/api/kessel/relations/v1/*.proto src/main/proto/kessel/relations/v1/
+          cp -r relations-api/api/kessel/relations/v1beta1/*.proto src/main/proto/kessel/relations/v1beta1/
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'Sync updated proto files'
+          title: Update protos
