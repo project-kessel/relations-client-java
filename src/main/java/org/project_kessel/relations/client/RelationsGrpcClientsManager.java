@@ -4,7 +4,7 @@ import io.grpc.Channel;
 import org.project_kessel.clients.ChannelManager;
 import org.project_kessel.clients.KesselClientsManager;
 
-public final class RelationsGrpcClientsManager extends KesselClientsManager {
+public class RelationsGrpcClientsManager extends KesselClientsManager {
     private RelationsGrpcClientsManager(Channel channel) {
         super(channel);
     }
