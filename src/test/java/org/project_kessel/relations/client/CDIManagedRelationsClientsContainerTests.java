@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Use Weld as a test container to check CDI functionality.
  */
 @EnableWeld
-class CDIManagedClientsContainerTests {
+class CDIManagedRelationsClientsContainerTests {
     @WeldSetup
     public WeldInitiator weld = WeldInitiator.from(new Weld().setBeanDiscoveryMode(BeanDiscoveryMode.ALL).addBeanClass(TestConfig.class)).build();
 

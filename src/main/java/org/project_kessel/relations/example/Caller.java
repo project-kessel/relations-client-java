@@ -3,10 +3,10 @@ package org.project_kessel.relations.example;
 import org.project_kessel.api.relations.v1beta1.*;
 import org.project_kessel.api.relations.v1.GetLivezRequest;
 import org.project_kessel.api.relations.v1.GetReadyzRequest;
-import org.project_kessel.relations.client.RelationsGrpcClientsManager;
 import io.grpc.stub.StreamObserver;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
+import org.project_kessel.relations.client.RelationsGrpcClientsManager;
 
 import java.util.ArrayList;
 import java.util.Collections;

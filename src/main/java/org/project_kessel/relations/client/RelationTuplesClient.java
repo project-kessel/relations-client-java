@@ -11,16 +11,13 @@ import io.grpc.Channel;
 import io.grpc.stub.StreamObserver;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.operators.multi.processors.UnicastProcessor;
+import org.project_kessel.clients.KesselClient;
 
 import java.util.Iterator;
 
-public class RelationTuplesClient {
-    private final KesselTupleServiceGrpc.KesselTupleServiceStub asyncStub;
-    private final KesselTupleServiceGrpc.KesselTupleServiceBlockingStub blockingStub;
-
+public class RelationTuplesClient extends KesselClient<KesselTupleServiceGrpc.KesselTupleServiceStub, KesselTupleServiceGrpc.KesselTupleServiceBlockingStub> {
     RelationTuplesClient(Channel channel) {
-        asyncStub = KesselTupleServiceGrpc.newStub(channel);
-        blockingStub = KesselTupleServiceGrpc.newBlockingStub(channel);
+        super(KesselTupleServiceGrpc.newStub(channel), KesselTupleServiceGrpc.newBlockingStub(channel));
     }
 
     /**
