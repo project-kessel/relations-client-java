@@ -13,9 +13,11 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @ApplicationScoped
 public class TestBeans {
+    public static final String APPLICATION_SCOPED_CLIENT_MANAGER = "ApplicationScopedClientManager";
+
     @Produces
     @ApplicationScoped
-    @TestQualifier("AppScopedClientsManager")
+    @TestQualifier(APPLICATION_SCOPED_CLIENT_MANAGER)
     RelationsGrpcClientsManager getApplicationScopedRelationsGrpcClientsManager() {
         return RelationsGrpcClientsManager.forInsecureClients("localhost:8080");
     }

@@ -20,6 +20,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.project_kessel.relations.client.TestBeans.APPLICATION_SCOPED_CLIENT_MANAGER;
 
 /**
  * Use Weld as a test container to check CDI functionality.
@@ -110,7 +111,7 @@ class CDIManagedRelationsClientsContainerTests {
         try (WeldContainer container = weld.container()) {
             /* @TestQualifier bean is @ApplicationScoped, so this injection will fail if bean can't be proxied as
             * @ApplicationScoped beans are. Need to check that RelationsGrpcClientsManager can be proxied. */
-            container.select(RelationsGrpcClientsManager.class, new TestBeans.TestQualifier.Literal("AppScopedClientsManager")).get();
+            container.select(RelationsGrpcClientsManager.class, new TestBeans.TestQualifier.Literal(APPLICATION_SCOPED_CLIENT_MANAGER)).get();
         }
         catch(Exception e) {
             fail("No exception should be thrown if RelationsGrpcClientsManager can be proxied.");
