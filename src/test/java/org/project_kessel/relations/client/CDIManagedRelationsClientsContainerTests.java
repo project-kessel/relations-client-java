@@ -1,5 +1,6 @@
 package org.project_kessel.relations.client;
 
+import org.jboss.weld.environment.se.WeldContainer;
 import org.project_kessel.api.relations.v1beta1.*;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
@@ -18,6 +19,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Use Weld as a test container to check CDI functionality.
@@ -101,6 +103,19 @@ class CDIManagedRelationsClientsContainerTests {
         assertEquals(CheckResponse.Allowed.ALLOWED_TRUE, checkResponse.getAllowed());
         assertEquals("TestType", relationTuplesResponse.next().getTuple().getResource().getType().getName());
         assertEquals("TestSubjectId", lookupResponse.next().getSubject().getSubject().getId());
+    }
+
+    @Test
+    void applicationScopedInjectionTest() {
+        try (WeldContainer container = weld.container()) {
+            /* @TestQualifier bean is @ApplicationScoped, so this injection will fail if bean can't be proxied as
+            * @ApplicationScoped beans are. Need to check that RelationsGrpcClientsManager can be proxied. */
+            container.select(RelationsGrpcClientsManager.class, new TestBeans.TestQualifier.Literal("AppScopedClientsManager")).get();
+        }
+        catch(Exception e) {
+            fail("No exception should be thrown if RelationsGrpcClientsManager can be proxied.");
+        }
+
     }
 
     /*
