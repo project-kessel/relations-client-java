@@ -10,6 +10,9 @@ jobs:
   build:
     name: Sync protos to clients
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - name: Clone relations-api repo
