@@ -46,8 +46,4 @@ public class RelationsGrpcClientsManager extends KesselClientsManager {
     public LookupClient getLookupClient() {
         return new LookupClient(channel);
     }
-
-    public HealthClient getHealthClient() {
-        return new HealthClient(channel);
-    }
 }
