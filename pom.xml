@@ -88,9 +88,9 @@
       <version>1.64.0</version>
     </dependency>
     <dependency>
-      <groupId>build.buf.protoc-gen-validate</groupId>
-      <artifactId>pgv-java-stub</artifactId>
-      <version>1.0.4</version>
+      <groupId>build.buf</groupId>
+      <artifactId>protovalidate</artifactId>
+      <version>0.3.0</version>
     </dependency>
     <!-- Default OIDC implementation. Must be provided by the user. -->
     <dependency>
@@ -157,19 +157,6 @@
               <goal>compile</goal>
               <goal>compile-custom</goal>
             </goals>
-          </execution>
-          <execution>
-            <id>protoc-java-pgv</id>
-            <goals>
-              <goal>compile-custom</goal>
-            </goals>
-            <configuration>
-              <pluginParameter>lang=java</pluginParameter>
-              <pluginId>java-pgv</pluginId>
-              <pluginArtifact>
-                build.buf.protoc-gen-validate:protoc-gen-validate:1.0.4:exe:${os.detected.classifier}
-              </pluginArtifact>
-            </configuration>
           </execution>
         </executions>
       </plugin>
