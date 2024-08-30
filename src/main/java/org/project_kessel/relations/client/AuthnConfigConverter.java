@@ -7,12 +7,13 @@ import org.project_kessel.clients.authn.oidc.client.OIDCClientCredentialsAuthent
 public class AuthnConfigConverter {
 
     public static AuthenticationConfig convert(Config.AuthenticationConfig authnConfig) {
-        if(authnConfig == null) {
+        if (authnConfig == null) {
             return null;
         }
         AuthenticationConfig convertedAuthnConfig;
-        if(authnConfig.clientCredentialsConfig().isPresent()) {
-            Config.OIDCClientCredentialsConfig oidcClientCredentialsConfig = authnConfig.clientCredentialsConfig().get();
+        if (authnConfig.clientCredentialsConfig().isPresent()) {
+            Config.OIDCClientCredentialsConfig oidcClientCredentialsConfig =
+                    authnConfig.clientCredentialsConfig().get();
 
             convertedAuthnConfig = new OIDCClientCredentialsAuthenticationConfig();
             var convertedOidcClientCredentialsConfig = new OIDCClientCredentialsConfig();
@@ -20,9 +21,11 @@ public class AuthnConfigConverter {
             convertedOidcClientCredentialsConfig.setClientId(oidcClientCredentialsConfig.clientId());
             convertedOidcClientCredentialsConfig.setClientSecret(oidcClientCredentialsConfig.clientSecret());
             convertedOidcClientCredentialsConfig.setScope(oidcClientCredentialsConfig.scope());
-            convertedOidcClientCredentialsConfig.setOidcClientCredentialsMinterImplementation(oidcClientCredentialsConfig.oidcClientCredentialsMinterImplementation());
+            convertedOidcClientCredentialsConfig.setOidcClientCredentialsMinterImplementation(
+                    oidcClientCredentialsConfig.oidcClientCredentialsMinterImplementation());
 
-            ((OIDCClientCredentialsAuthenticationConfig)convertedAuthnConfig).setCredentialsConfig(convertedOidcClientCredentialsConfig);
+            ((OIDCClientCredentialsAuthenticationConfig) convertedAuthnConfig).setCredentialsConfig(
+                    convertedOidcClientCredentialsConfig);
         } else {
             convertedAuthnConfig = new AuthenticationConfig();
         }

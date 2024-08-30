@@ -1,26 +1,27 @@
 package org.project_kessel.relations.client;
 
-import org.project_kessel.api.relations.v1beta1.KesselTupleServiceGrpc;
-import org.project_kessel.api.relations.v1beta1.CreateTuplesRequest;
-import org.project_kessel.api.relations.v1beta1.ReadTuplesRequest;
-import org.project_kessel.api.relations.v1beta1.DeleteTuplesRequest;
-import org.project_kessel.api.relations.v1beta1.CreateTuplesResponse;
-import org.project_kessel.api.relations.v1beta1.ReadTuplesResponse;
-import org.project_kessel.api.relations.v1beta1.DeleteTuplesResponse;
 import io.grpc.Channel;
 import io.grpc.stub.StreamObserver;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.operators.multi.processors.UnicastProcessor;
+import java.util.Iterator;
+import org.project_kessel.api.relations.v1beta1.CreateTuplesRequest;
+import org.project_kessel.api.relations.v1beta1.CreateTuplesResponse;
+import org.project_kessel.api.relations.v1beta1.DeleteTuplesRequest;
+import org.project_kessel.api.relations.v1beta1.DeleteTuplesResponse;
+import org.project_kessel.api.relations.v1beta1.KesselTupleServiceGrpc;
+import org.project_kessel.api.relations.v1beta1.ReadTuplesRequest;
+import org.project_kessel.api.relations.v1beta1.ReadTuplesResponse;
 import org.project_kessel.clients.KesselClient;
 
-import java.util.Iterator;
-
-public class RelationTuplesClient extends KesselClient<KesselTupleServiceGrpc.KesselTupleServiceStub, KesselTupleServiceGrpc.KesselTupleServiceBlockingStub> {
+public class RelationTuplesClient extends KesselClient<KesselTupleServiceGrpc.KesselTupleServiceStub,
+        KesselTupleServiceGrpc.KesselTupleServiceBlockingStub> {
     RelationTuplesClient(Channel channel) {
         super(KesselTupleServiceGrpc.newStub(channel), KesselTupleServiceGrpc.newBlockingStub(channel));
     }
 
     /**
+     *
      */
     public void createTuples(CreateTuplesRequest request,
                              StreamObserver<CreateTuplesResponse> responseObserver) {
@@ -28,12 +29,14 @@ public class RelationTuplesClient extends KesselClient<KesselTupleServiceGrpc.Ke
     }
 
     /**
+     *
      */
     public CreateTuplesResponse createTuples(CreateTuplesRequest request) {
         return blockingStub.createTuples(request);
     }
 
     /**
+     *
      */
     public void readTuples(ReadTuplesRequest request,
                            StreamObserver<ReadTuplesResponse> responseObserver) {
@@ -41,12 +44,14 @@ public class RelationTuplesClient extends KesselClient<KesselTupleServiceGrpc.Ke
     }
 
     /**
+     *
      */
     public Iterator<ReadTuplesResponse> readTuples(ReadTuplesRequest request) {
         return blockingStub.readTuples(request);
     }
 
     /**
+     *
      */
     public void deleteTuples(DeleteTuplesRequest request,
                              StreamObserver<DeleteTuplesResponse> responseObserver) {
@@ -54,6 +59,7 @@ public class RelationTuplesClient extends KesselClient<KesselTupleServiceGrpc.Ke
     }
 
     /**
+     *
      */
     public DeleteTuplesResponse deleteTuples(DeleteTuplesRequest request) {
         return blockingStub.deleteTuples(request);

@@ -1,17 +1,27 @@
 package org.project_kessel.relations.example;
 
-import org.project_kessel.api.relations.v1beta1.*;
 import io.grpc.stub.StreamObserver;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
-import org.project_kessel.relations.client.RelationsGrpcClientsManager;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+import org.project_kessel.api.relations.v1beta1.LookupSubjectsResponse;
+import org.project_kessel.api.relations.v1beta1.LookupSubjectsRequest;
+import org.project_kessel.api.relations.v1beta1.LookupResourcesResponse;
+import org.project_kessel.api.relations.v1beta1.LookupResourcesRequest;
+import org.project_kessel.api.relations.v1beta1.ReadTuplesRequest;
+import org.project_kessel.api.relations.v1beta1.ReadTuplesResponse;
+import org.project_kessel.api.relations.v1beta1.RelationTupleFilter;
+import org.project_kessel.api.relations.v1beta1.CheckRequest;
+import org.project_kessel.api.relations.v1beta1.CheckResponse;
+import org.project_kessel.api.relations.v1beta1.ObjectReference;
+import org.project_kessel.api.relations.v1beta1.ObjectType;
+import org.project_kessel.api.relations.v1beta1.SubjectReference;
+import org.project_kessel.relations.client.RelationsGrpcClientsManager;
 
 public class Caller {
 
@@ -27,11 +37,11 @@ public class Caller {
 
         var checkRequest = CheckRequest.newBuilder()
                 .setSubject(SubjectReference.newBuilder()
-                                .setSubject(ObjectReference.newBuilder()
-                                        .setType(ObjectType.newBuilder()
-                                                .setName("user").build())
-                                        .setId(userName).build())
-                                .build())
+                        .setSubject(ObjectReference.newBuilder()
+                                .setType(ObjectType.newBuilder()
+                                        .setName("user").build())
+                                .setId(userName).build())
+                        .build())
                 .setRelation(permission)
                 .setResource(ObjectReference.newBuilder()
                         .setType(ObjectType.newBuilder()
@@ -249,11 +259,11 @@ public class Caller {
         var lookupResourcesRequest = LookupResourcesRequest.newBuilder()
                 .setResourceType(ObjectType.newBuilder().setName("thing"))
                 .setRelation("view").setSubject(SubjectReference.newBuilder()
-                  .setSubject(ObjectReference.newBuilder()
-                        .setType(ObjectType.newBuilder()
-                                .setName("user").build())
-                        .setId("bob").build())
-                .build()).build();
+                        .setSubject(ObjectReference.newBuilder()
+                                .setType(ObjectType.newBuilder()
+                                        .setName("user").build())
+                                .setId("bob").build())
+                        .build()).build();
 
         var resourceIterator = lookupClient.lookupResources(lookupResourcesRequest);
         Iterable<LookupResourcesResponse> iterable = () -> resourceIterator;

@@ -4,8 +4,8 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import io.smallrye.config.SmallRyeConfigBuilder;
 import io.smallrye.config.common.MapBackedConfigSource;
-import org.junit.jupiter.api.Test;
 import java.util.HashMap;
+import org.junit.jupiter.api.Test;
 
 
 class ConfigTest {

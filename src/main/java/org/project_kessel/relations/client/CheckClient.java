@@ -1,17 +1,17 @@
 package org.project_kessel.relations.client;
 
-import org.project_kessel.api.relations.v1beta1.KesselCheckServiceGrpc;
-import org.project_kessel.api.relations.v1beta1.CheckRequest;
-import org.project_kessel.api.relations.v1beta1.CheckResponse;
 import io.grpc.Channel;
 import io.grpc.stub.StreamObserver;
 import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.operators.multi.processors.UnicastProcessor;
+import java.util.logging.Logger;
+import org.project_kessel.api.relations.v1beta1.CheckRequest;
+import org.project_kessel.api.relations.v1beta1.CheckResponse;
+import org.project_kessel.api.relations.v1beta1.KesselCheckServiceGrpc;
 import org.project_kessel.clients.KesselClient;
 
-import java.util.logging.Logger;
-
-public class CheckClient extends KesselClient<KesselCheckServiceGrpc.KesselCheckServiceStub, KesselCheckServiceGrpc.KesselCheckServiceBlockingStub> {
+public class CheckClient extends KesselClient<KesselCheckServiceGrpc.KesselCheckServiceStub,
+        KesselCheckServiceGrpc.KesselCheckServiceBlockingStub> {
     private static final Logger logger = Logger.getLogger(CheckClient.class.getName());
 
     CheckClient(Channel channel) {

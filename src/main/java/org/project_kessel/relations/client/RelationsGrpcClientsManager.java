@@ -5,26 +5,33 @@ import org.project_kessel.clients.ChannelManager;
 import org.project_kessel.clients.KesselClientsManager;
 
 public class RelationsGrpcClientsManager extends KesselClientsManager {
+    private static final String CHANNEL_MANAGER_KEY = RelationsGrpcClientsManager.class.getName();
+
     private RelationsGrpcClientsManager(Channel channel) {
         super(channel);
     }
 
-    private static final String CHANNEL_MANAGER_KEY = RelationsGrpcClientsManager.class.getName();
-
     public static RelationsGrpcClientsManager forInsecureClients(String targetUrl) {
-        return new RelationsGrpcClientsManager(ChannelManager.getInstance(CHANNEL_MANAGER_KEY).forInsecureClients(targetUrl));
+        return new RelationsGrpcClientsManager(
+                ChannelManager.getInstance(CHANNEL_MANAGER_KEY).forInsecureClients(targetUrl));
     }
 
-    public static RelationsGrpcClientsManager forInsecureClients(String targetUrl, Config.AuthenticationConfig authnConfig) throws RuntimeException {
-        return new RelationsGrpcClientsManager(ChannelManager.getInstance(CHANNEL_MANAGER_KEY).forInsecureClients(targetUrl, AuthnConfigConverter.convert(authnConfig)));
+    public static RelationsGrpcClientsManager forInsecureClients(String targetUrl,
+                                                                 Config.AuthenticationConfig authnConfig)
+            throws RuntimeException {
+        return new RelationsGrpcClientsManager(ChannelManager.getInstance(CHANNEL_MANAGER_KEY)
+                .forInsecureClients(targetUrl, AuthnConfigConverter.convert(authnConfig)));
     }
 
     public static RelationsGrpcClientsManager forSecureClients(String targetUrl) {
-        return new RelationsGrpcClientsManager(ChannelManager.getInstance(CHANNEL_MANAGER_KEY).forSecureClients(targetUrl));
+        return new RelationsGrpcClientsManager(
+                ChannelManager.getInstance(CHANNEL_MANAGER_KEY).forSecureClients(targetUrl));
     }
 
-    public static RelationsGrpcClientsManager forSecureClients(String targetUrl, Config.AuthenticationConfig authnConfig) {
-        return new RelationsGrpcClientsManager(ChannelManager.getInstance(CHANNEL_MANAGER_KEY).forSecureClients(targetUrl, AuthnConfigConverter.convert(authnConfig)));
+    public static RelationsGrpcClientsManager forSecureClients(String targetUrl,
+                                                               Config.AuthenticationConfig authnConfig) {
+        return new RelationsGrpcClientsManager(ChannelManager.getInstance(CHANNEL_MANAGER_KEY)
+                .forSecureClients(targetUrl, AuthnConfigConverter.convert(authnConfig)));
     }
 
     public static void shutdownAll() {
