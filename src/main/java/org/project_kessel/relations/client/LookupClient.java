@@ -4,13 +4,17 @@ import io.grpc.Channel;
 import io.grpc.stub.StreamObserver;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.operators.multi.processors.UnicastProcessor;
-import org.project_kessel.api.relations.v1beta1.*;
-import org.project_kessel.clients.KesselClient;
-
 import java.util.Iterator;
 import java.util.logging.Logger;
+import org.project_kessel.api.relations.v1beta1.LookupSubjectsResponse;
+import org.project_kessel.api.relations.v1beta1.LookupSubjectsRequest;
+import org.project_kessel.api.relations.v1beta1.LookupResourcesResponse;
+import org.project_kessel.api.relations.v1beta1.LookupResourcesRequest;
+import org.project_kessel.api.relations.v1beta1.KesselLookupServiceGrpc;
+import org.project_kessel.clients.KesselClient;
 
-public class LookupClient extends KesselClient<KesselLookupServiceGrpc.KesselLookupServiceStub,KesselLookupServiceGrpc.KesselLookupServiceBlockingStub> {
+public class LookupClient extends KesselClient<KesselLookupServiceGrpc.KesselLookupServiceStub,
+        KesselLookupServiceGrpc.KesselLookupServiceBlockingStub> {
     private static final Logger logger = Logger.getLogger(LookupClient.class.getName());
 
     LookupClient(Channel channel) {
@@ -21,7 +25,12 @@ public class LookupClient extends KesselClient<KesselLookupServiceGrpc.KesselLoo
         asyncStub.lookupSubjects(request, responseObserver);
     }
 
-    public void lookupResources(LookupResourcesRequest request, StreamObserver<LookupResourcesResponse> responseObserver) {
+    public Iterator<LookupSubjectsResponse> lookupSubjects(LookupSubjectsRequest request) {
+        return blockingStub.lookupSubjects(request);
+    }
+
+    public void lookupResources(LookupResourcesRequest request,
+                                StreamObserver<LookupResourcesResponse> responseObserver) {
         asyncStub.lookupResources(request, responseObserver);
     }
 
@@ -53,10 +62,6 @@ public class LookupClient extends KesselClient<KesselLookupServiceGrpc.KesselLoo
         lookupResources(request, streamObserver);
 
         return multi;
-    }
-
-    public Iterator<LookupSubjectsResponse> lookupSubjects(LookupSubjectsRequest request) {
-        return blockingStub.lookupSubjects(request);
     }
 
     public Multi<LookupSubjectsResponse> lookupSubjectsMulti(LookupSubjectsRequest request) {

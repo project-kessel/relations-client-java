@@ -3,9 +3,8 @@ package org.project_kessel.relations.client;
 import io.smallrye.config.ConfigMapping;
 import io.smallrye.config.WithDefault;
 import io.smallrye.config.WithName;
-import org.project_kessel.clients.authn.AuthenticationConfig.AuthMode;
-
 import java.util.Optional;
+import org.project_kessel.clients.authn.AuthenticationConfig.AuthMode;
 
 /**
  * Interface for injecting config into container managed beans.
@@ -17,6 +16,7 @@ import java.util.Optional;
 public interface Config {
     @WithDefault("false")
     boolean isSecureClients();
+
     String targetUrl();
 
     @WithName("authn")
@@ -25,17 +25,22 @@ public interface Config {
     interface AuthenticationConfig {
         @WithDefault("disabled")
         AuthMode mode();
+
         @WithName("client")
         Optional<OIDCClientCredentialsConfig> clientCredentialsConfig();
     }
 
-     interface OIDCClientCredentialsConfig {
+    interface OIDCClientCredentialsConfig {
         String issuer();
+
         @WithName("id")
         String clientId();
+
         @WithName("secret")
         String clientSecret();
+
         Optional<String[]> scope();
+
         Optional<String> oidcClientCredentialsMinterImplementation();
     }
 }

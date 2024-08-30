@@ -1,10 +1,14 @@
 package org.project_kessel.relations.client;
 
-import org.project_kessel.api.relations.v1beta1.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
 import jakarta.inject.Inject;
+import java.io.IOException;
+import java.util.Optional;
 import org.jboss.weld.bootstrap.spi.BeanDiscoveryMode;
 import org.jboss.weld.environment.se.Weld;
 import org.jboss.weld.junit5.EnableWeld;
@@ -13,32 +17,37 @@ import org.jboss.weld.junit5.WeldSetup;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.project_kessel.api.relations.v1beta1.CheckRequest;
+import org.project_kessel.api.relations.v1beta1.CheckResponse;
+import org.project_kessel.api.relations.v1beta1.KesselCheckServiceGrpc;
+import org.project_kessel.api.relations.v1beta1.KesselLookupServiceGrpc;
+import org.project_kessel.api.relations.v1beta1.KesselTupleServiceGrpc;
+import org.project_kessel.api.relations.v1beta1.LookupSubjectsRequest;
+import org.project_kessel.api.relations.v1beta1.LookupSubjectsResponse;
+import org.project_kessel.api.relations.v1beta1.ObjectReference;
+import org.project_kessel.api.relations.v1beta1.ObjectType;
+import org.project_kessel.api.relations.v1beta1.ReadTuplesRequest;
+import org.project_kessel.api.relations.v1beta1.ReadTuplesResponse;
+import org.project_kessel.api.relations.v1beta1.Relationship;
+import org.project_kessel.api.relations.v1beta1.SubjectReference;
 
-import java.io.IOException;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Use Weld as a test container to check CDI functionality.
  */
 @EnableWeld
 class CDIManagedRelationsClientsContainerTests {
-    @WeldSetup
-    public WeldInitiator weld = WeldInitiator.from(new Weld().setBeanDiscoveryMode(BeanDiscoveryMode.ALL).addBeanClass(TestConfig.class)).build();
-
     private static final int testServerPort = 7000;
-
+    private static Server grpcServer;
+    @WeldSetup
+    public WeldInitiator weld = WeldInitiator.from(new Weld().setBeanDiscoveryMode(BeanDiscoveryMode.ALL)
+            .addBeanClass(TestConfig.class)).build();
     @Inject
     CheckClient checkClient;
-
     @Inject
     RelationTuplesClient relationTuplesClient;
-
     @Inject
     LookupClient lookupClient;
-
-    private static Server grpcServer;
 
     /*
      Start a grpcServer with the following services added and some custom responses that we can check for in the tests.
@@ -50,7 +59,8 @@ class CDIManagedRelationsClientsContainerTests {
         serverBuilder.addService(new KesselCheckServiceGrpc.KesselCheckServiceImplBase() {
             @Override
             public void check(CheckRequest request, StreamObserver<CheckResponse> responseObserver) {
-                responseObserver.onNext(CheckResponse.newBuilder().setAllowed(CheckResponse.Allowed.ALLOWED_TRUE).build());
+                responseObserver.onNext(CheckResponse.newBuilder().setAllowed(CheckResponse.Allowed.ALLOWED_TRUE)
+                        .build());
                 responseObserver.onCompleted();
             }
         });
@@ -58,23 +68,24 @@ class CDIManagedRelationsClientsContainerTests {
             @Override
             public void readTuples(ReadTuplesRequest request, StreamObserver<ReadTuplesResponse> responseObserver) {
                 responseObserver.onNext(ReadTuplesResponse.newBuilder().setTuple(
-                        Relationship.newBuilder().setResource(
-                                ObjectReference.newBuilder().setType(
-                                        ObjectType.newBuilder().setName("TestType"))
+                                Relationship.newBuilder().setResource(
+                                                ObjectReference.newBuilder().setType(
+                                                                ObjectType.newBuilder().setName("TestType"))
+                                                        .build())
                                         .build())
-                                .build())
                         .build());
                 responseObserver.onCompleted();
             }
         });
         serverBuilder.addService(new KesselLookupServiceGrpc.KesselLookupServiceImplBase() {
             @Override
-            public void lookupSubjects(LookupSubjectsRequest request, StreamObserver<LookupSubjectsResponse> responseObserver) {
+            public void lookupSubjects(LookupSubjectsRequest request,
+                                       StreamObserver<LookupSubjectsResponse> responseObserver) {
                 responseObserver.onNext(LookupSubjectsResponse.newBuilder().setSubject(
-                        SubjectReference.newBuilder().setSubject(
-                                ObjectReference.newBuilder().setId("TestSubjectId")
+                                SubjectReference.newBuilder().setSubject(
+                                                ObjectReference.newBuilder().setId("TestSubjectId")
+                                                        .build())
                                         .build())
-                                .build())
                         .build());
                 responseObserver.onCompleted();
             }

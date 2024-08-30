@@ -19,13 +19,13 @@ public class CDIManagedRelationsClients {
         var authnEnabled = config.authenticationConfig().map(t -> !t.mode().equals(AuthMode.DISABLED)).orElse(false);
 
         if (isSecureClients) {
-            if(authnEnabled) {
+            if (authnEnabled) {
                 return RelationsGrpcClientsManager.forSecureClients(targetUrl, config.authenticationConfig().get());
             }
             return RelationsGrpcClientsManager.forSecureClients(targetUrl);
         }
 
-        if(authnEnabled) {
+        if (authnEnabled) {
             return RelationsGrpcClientsManager.forInsecureClients(targetUrl, config.authenticationConfig().get());
         }
         return RelationsGrpcClientsManager.forInsecureClients(targetUrl);
