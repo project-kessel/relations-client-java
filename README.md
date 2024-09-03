@@ -57,7 +57,7 @@ Let's say we to look up all of the resources of type "workspace" that a subject 
 
 ```java
 var lookupResourcesRequest = LookupResourcesRequest.newBuilder()
-                .setResourceType(ObjectType.newBuilder().setName("thing"))
+                .setResourceType(ObjectType.newBuilder().setName("workspace"))
                 .setRelation("view").setSubject(SubjectReference.newBuilder()
                         .setSubject(ObjectReference.newBuilder()
                                 .setType(ObjectType.newBuilder()
