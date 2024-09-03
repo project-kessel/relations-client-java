@@ -27,18 +27,23 @@ var clientsManager = RelationsGrpcClientsManager.forInsecureClients(url);
 var checkClient = clientsManager.getCheckClient();
 ```
 ### Making requests
-Synchronous:
+#### Synchronous example
+
+Let's say we want to check whether a subject of type "user" with id "bob" has "view" permission to a resource of type "workspace" and id "hosts". We can make the following synchronous check request:
+
 ```java
 var checkRequest = CheckRequest.newBuilder()
                 .setSubject(SubjectReference.newBuilder()
-                                .setObject(ObjectReference.newBuilder()
-                                        .setType("user")
-                                        .setId("joe").build())
-                                .build())
+                        .setSubject(ObjectReference.newBuilder()
+                                .setType(ObjectType.newBuilder()
+                                        .setName("user").build())
+                                .setId("bob").build())
+                        .build())
                 .setRelation("view")
-                .setObject(ObjectReference.newBuilder()
-                        .setType("thing")
-                        .setId("resource")
+                .setResource(ObjectReference.newBuilder()
+                        .setType(ObjectType.newBuilder()
+                                .setName("workspace").build())
+                        .setId("hosts")
                         .build())
                 .build();
 
@@ -46,18 +51,31 @@ var checkResponse = checkClient.check(checkRequest);
 var permitted = checkResponse.getAllowed() == CheckResponse.Allowed.ALLOWED_TRUE;
 ```
 
-Asynchronous reactive (using Mutiny):
+#### Asynchronous reactive example (using Mutiny)
+
+Let's say we to look up all of the resources of type "workspace" that a subject of type "user" and id "bob" has "view" permission on. Since there may be many responses, we might want to operate on them asynchronously as they come in, but we may also want to collect them all afterwards and perform a synchronous operation on the list. We can make the following request using the mutiny reactive programming API to achieve both: 
 
 ```java
-Uni<CheckResponse> uni = checkClient.checkUni(checkRequest);
+var lookupResourcesRequest = LookupResourcesRequest.newBuilder()
+                .setResourceType(ObjectType.newBuilder().setName("thing"))
+                .setRelation("view").setSubject(SubjectReference.newBuilder()
+                        .setSubject(ObjectReference.newBuilder()
+                                .setType(ObjectType.newBuilder()
+                                        .setName("user").build())
+                                .setId("bob").build())
+                        .build()).build();
 
-uni.onItem().invoke(() -> {
-                if(permitted) {
-                    System.out.println("Reactive non-blocking: Permitted");
-                } else {
-                    System.out.println("Reactive non-blocking: Denied");
-                }
-            });
+Multi<LookupResourcesResponse> multi = lookupClient.lookupResourcesMulti(lookupResourcesRequest);
+
+/* Pattern where we may want collect all the responses, but still operate on each as it comes in. */
+List<LookupResourcesResponse> responses = multi.onItem()
+        .invoke(response -> {
+            var tuple = response.getResource();
+            System.out.println("We can do something async here for each tuple: " + tuple);
+        })
+        .collect().asList().await().indefinitely();
+
+System.out.println("We can then wait here synchronously for the whole list if we want to: " + responses);
 ```
 
 ## Build
