@@ -222,11 +222,11 @@
           <violationSeverity>warning</violationSeverity>
           <linkXRef>false</linkXRef>
           <includeTestSourceDirectory>true</includeTestSourceDirectory>
+          <excludeGeneratedSources>true</excludeGeneratedSources>
         </configuration>
         <executions>
           <execution>
             <id>validate</id>
-            <phase>validate</phase>
             <goals>
               <goal>check</goal>
             </goals>

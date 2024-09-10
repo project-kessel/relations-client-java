@@ -25,28 +25,33 @@ import org.project_kessel.relations.client.RelationsGrpcClientsManager;
 
 public class Caller {
 
+    static final String userName = "joe";
+    static final String subjectType = "user";
+    static final String permission = "view_the_thing";
+    static final String namespace = "rbac";
+    static final String resourceType = "workspace";
+    static final String resourceId = "hosts";
+
     public static void main(String[] argv) {
         var url = "localhost:9000";
 
         var clientsManager = RelationsGrpcClientsManager.forInsecureClients(url);
         var checkClient = clientsManager.getCheckClient();
 
-        var userName = "joe";
-        var permission = "view";
-        var thing = "resource";
-
         var checkRequest = CheckRequest.newBuilder()
                 .setSubject(SubjectReference.newBuilder()
                         .setSubject(ObjectReference.newBuilder()
                                 .setType(ObjectType.newBuilder()
-                                        .setName("user").build())
+                                        .setNamespace(namespace)
+                                        .setName(subjectType).build())
                                 .setId(userName).build())
                         .build())
                 .setRelation(permission)
                 .setResource(ObjectReference.newBuilder()
                         .setType(ObjectType.newBuilder()
-                                .setName("thing").build())
-                        .setId(thing)
+                                .setNamespace(namespace)
+                                .setName(resourceType).build())
+                        .setId(resourceId)
                         .build())
                 .build();
 
@@ -136,7 +141,8 @@ public class Caller {
         var relationTuplesClient = clientsManager.getRelationTuplesClient();
 
         var roleBindingsOnWorkspaceFilter = RelationTupleFilter.newBuilder()
-                .setResourceType("role_binding").build();
+                .setResourceNamespace(namespace)
+                .setResourceType(resourceType).build();
         var readRelationshipsRequest = ReadTuplesRequest.newBuilder()
                 .setFilter(roleBindingsOnWorkspaceFilter).build();
 
@@ -217,9 +223,10 @@ public class Caller {
 
         var lookupSubjectsRequest = LookupSubjectsRequest.newBuilder().setResource(
                 ObjectReference.newBuilder()
-                        .setType(ObjectType.newBuilder().setName("thing").build())
-                        .setId("resource")
-        ).setRelation("view").setSubjectType(ObjectType.newBuilder().setName("user")).build();
+                        .setType(ObjectType.newBuilder().setNamespace(namespace).setName(resourceType).build())
+                        .setId(resourceId))
+                .setRelation(permission)
+                .setSubjectType(ObjectType.newBuilder().setNamespace(namespace).setName(subjectType)).build();
 
         /*
          * Blocking
@@ -257,12 +264,13 @@ public class Caller {
         var lookupClient = clientsManager.getLookupClient();
 
         var lookupResourcesRequest = LookupResourcesRequest.newBuilder()
-                .setResourceType(ObjectType.newBuilder().setName("thing"))
-                .setRelation("view").setSubject(SubjectReference.newBuilder()
+                .setResourceType(ObjectType.newBuilder().setNamespace(namespace).setName(resourceType))
+                .setRelation(permission).setSubject(SubjectReference.newBuilder()
                         .setSubject(ObjectReference.newBuilder()
                                 .setType(ObjectType.newBuilder()
-                                        .setName("user").build())
-                                .setId("bob").build())
+                                        .setNamespace(namespace)
+                                        .setName(subjectType).build())
+                                .setId(userName).build())
                         .build()).build();
 
         var resourceIterator = lookupClient.lookupResources(lookupResourcesRequest);
