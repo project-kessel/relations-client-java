@@ -66,3 +66,18 @@ This is a maven build, so do the usual things, e.g.
 ./mvnw clean package
 ```
 for a jar.
+
+## Code Style
+
+We are using a customized code style that builds off of Checkstyle's [official implementation of the Google Java style guide](https://checkstyle.sourceforge.io/google_style.html) at [`google_checks.xml`](https://github.com/project-kessel/relations-client-java/blob/main/google_checks.xml). The Checkstyle check will automatically run apart of PR pipelines and when using `./mvnw clean verify -Dgpg.skip`.
+
+### IDE Integration
+
+#### Intellij
+
+It is recommended to use the [Checkstyle plugin](https://plugins.jetbrains.com/plugin/1065-checkstyle-idea) to automatically highlight checkstyle violations and reformat code.
+
+#### VSCode
+
+It is recommended to use the [Checkstyle plugin](https://marketplace.visualstudio.com/items?itemName=shengchen.vscode-checkstyle) to automatically highlight checkstyle violations while coding.
+
