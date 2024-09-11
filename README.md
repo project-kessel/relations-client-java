@@ -29,23 +29,25 @@ var checkClient = clientsManager.getCheckClient();
 ### Making requests
 #### Synchronous example
 
-Let's say we want to check whether a subject of type "user" with id "bob" has "view" permission to a resource of type "workspace" and id "hosts". We can make the following synchronous check request:
+Let's say we want to check whether a subject of type "user" (in the "rbac" type namespace) with id "bob" has "view" permission to a resource of type "workspace" (in the "rbac" type namespace) and id "hosts". We can make the following synchronous check request:
 
 ```java
 var checkRequest = CheckRequest.newBuilder()
-                .setSubject(SubjectReference.newBuilder()
-                        .setSubject(ObjectReference.newBuilder()
-                                .setType(ObjectType.newBuilder()
-                                        .setName("user").build())
-                                .setId("bob").build())
-                        .build())
-                .setRelation("view")
-                .setResource(ObjectReference.newBuilder()
+        .setSubject(SubjectReference.newBuilder()
+                .setSubject(ObjectReference.newBuilder()
                         .setType(ObjectType.newBuilder()
-                                .setName("workspace").build())
-                        .setId("hosts")
-                        .build())
-                .build();
+                                .setNamespace("rbac")
+                                .setName("user").build())
+                        .setId("bob").build())
+                .build())
+        .setRelation("view")
+        .setResource(ObjectReference.newBuilder()
+                .setType(ObjectType.newBuilder()
+                        .setNamespace("rbac")
+                        .setName("workspace").build())
+                .setId("hosts")
+                .build())
+        .build();
 
 var checkResponse = checkClient.check(checkRequest);
 var permitted = checkResponse.getAllowed() == CheckResponse.Allowed.ALLOWED_TRUE;
@@ -57,13 +59,15 @@ Let's say we to look up all of the resources of type "workspace" that a subject 
 
 ```java
 var lookupResourcesRequest = LookupResourcesRequest.newBuilder()
-                .setResourceType(ObjectType.newBuilder().setName("workspace"))
-                .setRelation("view").setSubject(SubjectReference.newBuilder()
-                        .setSubject(ObjectReference.newBuilder()
-                                .setType(ObjectType.newBuilder()
-                                        .setName("user").build())
-                                .setId("bob").build())
-                        .build()).build();
+        .setResourceType(ObjectType.newBuilder()
+                .setNamespace("rbac").setName("workspace"))
+        .setRelation("view").setSubject(SubjectReference.newBuilder()
+                .setSubject(ObjectReference.newBuilder()
+                        .setType(ObjectType.newBuilder()
+                                .setNamespace("rbac")
+                                .setName("user").build())
+                        .setId("bob").build())
+                .build()).build();
 
 Multi<LookupResourcesResponse> multi = lookupClient.lookupResourcesMulti(lookupResourcesRequest);
 
