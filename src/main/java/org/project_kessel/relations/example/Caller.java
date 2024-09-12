@@ -27,10 +27,10 @@ public class Caller {
 
     static final String userName = "joe";
     static final String subjectType = "user";
-    static final String permission = "view_the_thing";
+    static final String permission = "view";
     static final String namespace = "rbac";
-    static final String resourceType = "workspace";
-    static final String resourceId = "hosts";
+    static final String resourceType = "thing";
+    static final String resourceId = "my_thing";
 
     public static void main(String[] argv) {
         var url = "localhost:9000";
