@@ -8,12 +8,13 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
+import org.mockito.internal.stubbing.answers.CallsRealMethods;
 import org.project_kessel.clients.authn.AuthenticationConfig;
 
 
 class CDIManagedRelationsClientsTest {
-    static Config makeDummyConfig(boolean secure, Config.AuthenticationConfig authnConfig) {
-        return new Config() {
+    static RelationsConfig makeDummyConfig(boolean secure, RelationsConfig.AuthenticationConfig authnConfig) {
+        return new RelationsConfig() {
             @Override
             public boolean isSecureClients() {
                 return secure;
@@ -31,8 +32,8 @@ class CDIManagedRelationsClientsTest {
         };
     }
 
-    static Config.AuthenticationConfig makeDummyAuthenticationConfig(boolean authnEnabled) {
-        return new Config.AuthenticationConfig() {
+    static RelationsConfig.AuthenticationConfig makeDummyAuthenticationConfig(boolean authnEnabled) {
+        return new RelationsConfig.AuthenticationConfig() {
             @Override
             public AuthenticationConfig.AuthMode mode() {
                 if (!authnEnabled) {
@@ -43,13 +44,13 @@ class CDIManagedRelationsClientsTest {
             }
 
             @Override
-            public Optional<Config.OIDCClientCredentialsConfig> clientCredentialsConfig() {
+            public Optional<RelationsConfig.OIDCClientCredentialsConfig> clientCredentialsConfig() {
                 if (!authnEnabled) {
                     return Optional.empty();
                 }
 
                 // provide dummy config matching mode, above.
-                return Optional.of(new Config.OIDCClientCredentialsConfig() {
+                return Optional.of(new RelationsConfig.OIDCClientCredentialsConfig() {
                     @Override
                     public String issuer() {
                         return "";
@@ -81,12 +82,13 @@ class CDIManagedRelationsClientsTest {
 
     @Test
     void testInsecureNoAuthnMakesCorrectManagerCall() {
-        Config config = makeDummyConfig(false, makeDummyAuthenticationConfig(false));
+        RelationsConfig config = makeDummyConfig(false, makeDummyAuthenticationConfig(false));
         CDIManagedRelationsClients cdiManagedRelationsClients = new CDIManagedRelationsClients();
 
         try (MockedStatic<RelationsGrpcClientsManager> dummyManager = Mockito.mockStatic(
-                RelationsGrpcClientsManager.class)) {
+                RelationsGrpcClientsManager.class, new CallsRealMethods())) {
             cdiManagedRelationsClients.getManager(config);
+
             dummyManager.verify(
                     () -> RelationsGrpcClientsManager.forInsecureClients(anyString()),
                     times(1)
@@ -108,11 +110,11 @@ class CDIManagedRelationsClientsTest {
 
     @Test
     void testInsecureWithAuthnMakesCorrectManagerCall() {
-        Config config = makeDummyConfig(false, makeDummyAuthenticationConfig(true));
+        RelationsConfig config = makeDummyConfig(false, makeDummyAuthenticationConfig(true));
         CDIManagedRelationsClients cdiManagedRelationsClients = new CDIManagedRelationsClients();
 
         try (MockedStatic<RelationsGrpcClientsManager> dummyManager = Mockito.mockStatic(
-                RelationsGrpcClientsManager.class)) {
+                RelationsGrpcClientsManager.class, new CallsRealMethods())) {
             cdiManagedRelationsClients.getManager(config);
             dummyManager.verify(
                     () -> RelationsGrpcClientsManager.forInsecureClients(anyString()),
@@ -135,11 +137,11 @@ class CDIManagedRelationsClientsTest {
 
     @Test
     void testSecureNoAuthnMakesCorrectManagerCall() {
-        Config config = makeDummyConfig(true, makeDummyAuthenticationConfig(false));
+        RelationsConfig config = makeDummyConfig(true, makeDummyAuthenticationConfig(false));
         CDIManagedRelationsClients cdiManagedRelationsClients = new CDIManagedRelationsClients();
 
         try (MockedStatic<RelationsGrpcClientsManager> dummyManager = Mockito.mockStatic(
-                RelationsGrpcClientsManager.class)) {
+                RelationsGrpcClientsManager.class, new CallsRealMethods())) {
             cdiManagedRelationsClients.getManager(config);
             dummyManager.verify(
                     () -> RelationsGrpcClientsManager.forInsecureClients(anyString()),
@@ -162,11 +164,11 @@ class CDIManagedRelationsClientsTest {
 
     @Test
     void testSecureWithAuthnMakesCorrectManagerCall() {
-        Config config = makeDummyConfig(true, makeDummyAuthenticationConfig(true));
+        RelationsConfig config = makeDummyConfig(true, makeDummyAuthenticationConfig(true));
         CDIManagedRelationsClients cdiManagedRelationsClients = new CDIManagedRelationsClients();
 
         try (MockedStatic<RelationsGrpcClientsManager> dummyManager = Mockito.mockStatic(
-                RelationsGrpcClientsManager.class)) {
+                RelationsGrpcClientsManager.class, new CallsRealMethods())) {
             cdiManagedRelationsClients.getManager(config);
             dummyManager.verify(
                     () -> RelationsGrpcClientsManager.forInsecureClients(anyString()),

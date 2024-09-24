@@ -3,6 +3,7 @@ package org.project_kessel.relations.client;
 import io.grpc.Channel;
 import org.project_kessel.clients.ChannelManager;
 import org.project_kessel.clients.KesselClientsManager;
+import org.project_kessel.clients.authn.AuthenticationConfig;
 
 public class RelationsGrpcClientsManager extends KesselClientsManager {
     private static final String CHANNEL_MANAGER_KEY = RelationsGrpcClientsManager.class.getName();
@@ -17,7 +18,7 @@ public class RelationsGrpcClientsManager extends KesselClientsManager {
     }
 
     public static RelationsGrpcClientsManager forInsecureClients(String targetUrl,
-                                                                 Config.AuthenticationConfig authnConfig)
+                                                                 RelationsConfig.AuthenticationConfig authnConfig)
             throws RuntimeException {
         return new RelationsGrpcClientsManager(ChannelManager.getInstance(CHANNEL_MANAGER_KEY)
                 .forInsecureClients(targetUrl, AuthnConfigConverter.convert(authnConfig)));
@@ -29,9 +30,28 @@ public class RelationsGrpcClientsManager extends KesselClientsManager {
     }
 
     public static RelationsGrpcClientsManager forSecureClients(String targetUrl,
-                                                               Config.AuthenticationConfig authnConfig) {
+                                                               RelationsConfig.AuthenticationConfig authnConfig) {
         return new RelationsGrpcClientsManager(ChannelManager.getInstance(CHANNEL_MANAGER_KEY)
                 .forSecureClients(targetUrl, AuthnConfigConverter.convert(authnConfig)));
+    }
+
+    public static RelationsGrpcClientsManager forClientsWithConfig(RelationsConfig config) {
+        var isSecureClients = config.isSecureClients();
+        var targetUrl = config.targetUrl();
+        var authnEnabled = config.authenticationConfig()
+                .map(t -> !t.mode().equals(AuthenticationConfig.AuthMode.DISABLED)).orElse(false);
+
+        if (isSecureClients) {
+            if (authnEnabled) {
+                return RelationsGrpcClientsManager.forSecureClients(targetUrl, config.authenticationConfig().get());
+            }
+            return RelationsGrpcClientsManager.forSecureClients(targetUrl);
+        }
+
+        if (authnEnabled) {
+            return RelationsGrpcClientsManager.forInsecureClients(targetUrl, config.authenticationConfig().get());
+        }
+        return RelationsGrpcClientsManager.forInsecureClients(targetUrl);
     }
 
     public static void shutdownAll() {

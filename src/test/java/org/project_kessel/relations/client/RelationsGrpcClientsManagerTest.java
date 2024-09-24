@@ -15,16 +15,16 @@ public class RelationsGrpcClientsManagerTest {
      Tests relying on reflection. Brittle and could be removed in future.
      */
 
-    public static Config.AuthenticationConfig dummyAuthConfigWithGoodOIDCClientCredentials() {
-        return new Config.AuthenticationConfig() {
+    public static RelationsConfig.AuthenticationConfig dummyAuthConfigWithGoodOIDCClientCredentials() {
+        return new RelationsConfig.AuthenticationConfig() {
             @Override
             public AuthenticationConfig.AuthMode mode() {
                 return AuthenticationConfig.AuthMode.OIDC_CLIENT_CREDENTIALS; // any non-disabled value
             }
 
             @Override
-            public Optional<Config.OIDCClientCredentialsConfig> clientCredentialsConfig() {
-                return Optional.of(new Config.OIDCClientCredentialsConfig() {
+            public Optional<RelationsConfig.OIDCClientCredentialsConfig> clientCredentialsConfig() {
+                return Optional.of(new RelationsConfig.OIDCClientCredentialsConfig() {
                     @Override
                     public String issuer() {
                         return "http://localhost:8090";

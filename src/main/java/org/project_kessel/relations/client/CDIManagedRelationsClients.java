@@ -13,35 +13,25 @@ import org.project_kessel.clients.authn.AuthenticationConfig.AuthMode;
 @ApplicationScoped
 public class CDIManagedRelationsClients {
     @Produces
-    RelationsGrpcClientsManager getManager(Config config) {
-        var isSecureClients = config.isSecureClients();
-        var targetUrl = config.targetUrl();
-        var authnEnabled = config.authenticationConfig().map(t -> !t.mode().equals(AuthMode.DISABLED)).orElse(false);
-
-        if (isSecureClients) {
-            if (authnEnabled) {
-                return RelationsGrpcClientsManager.forSecureClients(targetUrl, config.authenticationConfig().get());
-            }
-            return RelationsGrpcClientsManager.forSecureClients(targetUrl);
-        }
-
-        if (authnEnabled) {
-            return RelationsGrpcClientsManager.forInsecureClients(targetUrl, config.authenticationConfig().get());
-        }
-        return RelationsGrpcClientsManager.forInsecureClients(targetUrl);
+    @ApplicationScoped
+    RelationsGrpcClientsManager getManager(RelationsConfig config) {
+        return RelationsGrpcClientsManager.forClientsWithConfig(config);
     }
 
     @Produces
+    @ApplicationScoped
     CheckClient getCheckClient(RelationsGrpcClientsManager manager) {
         return manager.getCheckClient();
     }
 
     @Produces
+    @ApplicationScoped
     RelationTuplesClient getRelationsClient(RelationsGrpcClientsManager manager) {
         return manager.getRelationTuplesClient();
     }
 
     @Produces
+    @ApplicationScoped
     LookupClient getLookupClient(RelationsGrpcClientsManager manager) {
         return manager.getLookupClient();
     }

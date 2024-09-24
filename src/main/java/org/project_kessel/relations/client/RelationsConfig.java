@@ -13,7 +13,7 @@ import org.project_kessel.clients.authn.AuthenticationConfig.AuthMode;
  * Works directly for Quarkus. Might need an implementation class for future Spring Boot config.
  */
 @ConfigMapping(prefix = "relations-api")
-public interface Config {
+public interface RelationsConfig {
     @WithDefault("false")
     boolean isSecureClients();
 
