@@ -6,13 +6,13 @@ import org.project_kessel.clients.authn.oidc.client.OIDCClientCredentialsAuthent
 
 public class AuthnConfigConverter {
 
-    public static AuthenticationConfig convert(Config.AuthenticationConfig authnConfig) {
+    public static AuthenticationConfig convert(RelationsConfig.AuthenticationConfig authnConfig) {
         if (authnConfig == null) {
             return null;
         }
         AuthenticationConfig convertedAuthnConfig;
         if (authnConfig.clientCredentialsConfig().isPresent()) {
-            Config.OIDCClientCredentialsConfig oidcClientCredentialsConfig =
+            RelationsConfig.OIDCClientCredentialsConfig oidcClientCredentialsConfig =
                     authnConfig.clientCredentialsConfig().get();
 
             convertedAuthnConfig = new OIDCClientCredentialsAuthenticationConfig();

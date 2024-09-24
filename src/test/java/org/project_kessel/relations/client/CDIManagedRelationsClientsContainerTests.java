@@ -41,7 +41,7 @@ class CDIManagedRelationsClientsContainerTests {
     private static Server grpcServer;
     @WeldSetup
     public WeldInitiator weld = WeldInitiator.from(new Weld().setBeanDiscoveryMode(BeanDiscoveryMode.ALL)
-            .addBeanClass(TestConfig.class)).build();
+            .addBeanClass(TestRelationsConfig.class)).build();
     @Inject
     CheckClient checkClient;
     @Inject
@@ -115,9 +115,9 @@ class CDIManagedRelationsClientsContainerTests {
     }
 
     /*
-     Implementation of Config to inject manually with hardcoded settings.
+     Implementation of RelationsConfig to inject manually with hardcoded settings.
      */
-    static class TestConfig implements Config {
+    static class TestRelationsConfig implements RelationsConfig {
         @Override
         public boolean isSecureClients() {
             return false;
