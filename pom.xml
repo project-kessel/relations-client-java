@@ -90,7 +90,7 @@
     <dependency>
       <groupId>build.buf</groupId>
       <artifactId>protovalidate</artifactId>
-      <version>0.3.2</version>
+      <version>0.2.1</version>
     </dependency>
     <!-- Default OIDC implementation. Must be provided by the user. -->
     <dependency>

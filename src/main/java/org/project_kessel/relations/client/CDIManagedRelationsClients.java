@@ -13,25 +13,21 @@ import org.project_kessel.clients.authn.AuthenticationConfig.AuthMode;
 @ApplicationScoped
 public class CDIManagedRelationsClients {
     @Produces
-    @ApplicationScoped
     RelationsGrpcClientsManager getManager(RelationsConfig config) {
         return RelationsGrpcClientsManager.forClientsWithConfig(config);
     }
 
     @Produces
-    @ApplicationScoped
     CheckClient getCheckClient(RelationsGrpcClientsManager manager) {
         return manager.getCheckClient();
     }
 
     @Produces
-    @ApplicationScoped
     RelationTuplesClient getRelationsClient(RelationsGrpcClientsManager manager) {
         return manager.getRelationTuplesClient();
     }
 
     @Produces
-    @ApplicationScoped
     LookupClient getLookupClient(RelationsGrpcClientsManager manager) {
         return manager.getLookupClient();
     }
