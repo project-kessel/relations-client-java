@@ -103,7 +103,7 @@
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-core</artifactId>
-      <version>3.15.0</version>
+      <version>3.15.1</version>
       <scope>provided</scope>
     </dependency>
     <dependency> <!-- necessary for Java 9+ -->
