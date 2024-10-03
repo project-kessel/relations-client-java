@@ -9,6 +9,8 @@ import org.project_kessel.api.relations.v1beta1.CreateTuplesRequest;
 import org.project_kessel.api.relations.v1beta1.CreateTuplesResponse;
 import org.project_kessel.api.relations.v1beta1.DeleteTuplesRequest;
 import org.project_kessel.api.relations.v1beta1.DeleteTuplesResponse;
+import org.project_kessel.api.relations.v1beta1.ImportBulkTuplesRequest;
+import org.project_kessel.api.relations.v1beta1.ImportBulkTuplesResponse;
 import org.project_kessel.api.relations.v1beta1.KesselTupleServiceGrpc;
 import org.project_kessel.api.relations.v1beta1.ReadTuplesRequest;
 import org.project_kessel.api.relations.v1beta1.ReadTuplesResponse;
@@ -89,5 +91,17 @@ public class RelationTuplesClient extends KesselClient<KesselTupleServiceGrpc.Ke
         readTuples(request, streamObserver);
 
         return multi;
+    }
+
+    /**
+     * Enables bidirectional streaming of ImportBulkTuplesRequests and ImportBulkTuplesResponses.
+     * See https://grpc.io/docs/languages/java/basics/#bidirectional-streaming-rpc for how to use observers in clients.
+     * We may simplify the client implementation with mutiny reactive calls in future once requirements become clearer.
+     * @param responseObserver
+     * @return
+     */
+    public StreamObserver<ImportBulkTuplesRequest> importBulkTuples(
+            StreamObserver<ImportBulkTuplesResponse> responseObserver) {
+        return asyncStub.importBulkTuples(responseObserver);
     }
 }
