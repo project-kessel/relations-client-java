@@ -94,8 +94,8 @@ public class RelationTuplesClient extends KesselClient<KesselTupleServiceGrpc.Ke
     }
 
     /**
-     * Enables bidirectional streaming of ImportBulkTuplesRequests and ImportBulkTuplesResponses.
-     * See https://grpc.io/docs/languages/java/basics/#bidirectional-streaming-rpc for how to use observers in clients.
+     * Enables client streaming of ImportBulkTuplesRequests and ImportBulkTuplesResponse.
+     * See https://grpc.io/docs/languages/java/basics/#client-side-streaming-rpc-1 for how to use observers in clients.
      * We may simplify the client implementation with mutiny reactive calls in future once requirements become clearer.
      * @param responseObserver
      * @return
