@@ -62,7 +62,7 @@ class RelationTuplesClientServerTest {
         var failure = new AtomicReference<Throwable>();
 
         /*
-         * debugger verifies that responseObserver onComplete() in error scenarios
+         * debugger verifies that responseObserver onComplete() not called in error scenarios
          */
 
         // First option -- catch Exception
