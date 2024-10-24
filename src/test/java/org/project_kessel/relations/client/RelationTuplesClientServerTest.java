@@ -8,9 +8,12 @@ import org.junit.jupiter.api.Test;
 import org.project_kessel.api.relations.v1beta1.*;
 
 import java.util.List;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.StreamSupport;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -46,12 +49,19 @@ class RelationTuplesClientServerTest {
                 .await().indefinitely();
 
         assertEquals(15, response.getNumImported());
+        // Without read after write consistency, we try to wait for relations-api to give an updated read view
+//        try {
+//            Thread.sleep(4000);
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//        }
+//        assertEquals(15, countStoredRelationsips());
     }
 
     @Test
-    void testErrorDoesNotCallOnComplete() {
+    void testProblematicBatchFails() {
         List<Relationship> batch1 = relationshipListMaker(0, 10);
-        List<Relationship> batch2 = relationshipListMaker(9, 10); // repeat rel from batch 1 -- induce batch2 processing failure
+        List<Relationship> batch2 = relationshipListMaker(9, 10); // repeat rel from batch 1 -- induce processing failure (but only at the end)
         List<Relationship> batch3 = relationshipListMaker(15, 20);
         ImportBulkTuplesRequest req1 = ImportBulkTuplesRequest.newBuilder().addAllTuples(batch1).build();
         ImportBulkTuplesRequest req2 = ImportBulkTuplesRequest.newBuilder().addAllTuples(batch2).build();
@@ -84,7 +94,14 @@ class RelationTuplesClientServerTest {
         assertEquals(io.grpc.StatusRuntimeException.class, failure.get().getClass());
         assertTrue(failure.get().getMessage().startsWith("ALREADY_EXISTS: error import bulk tuples: error receiving "
                 + "response from Spicedb for bulkimport request"));
-        // TODO: add assert to show no relations are written -- verified manually that by looking at spicedb
+        assertEquals(0L, countStoredRelationsips());
+        // Without read after write consistency, we try to wait for relations-api to give an updated read view
+//        try {
+//            Thread.sleep(4000);
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//        }
+//        assertEquals(0, countStoredRelationsips());
     }
 
     List<Relationship> relationshipListMaker(int startPostfix, int endPostfix) {
@@ -120,5 +137,17 @@ class RelationTuplesClientServerTest {
                         .setId(thingId)
                         .build())
                 .build();
+    }
+
+    long countStoredRelationsips() {
+        ReadTuplesRequest request = ReadTuplesRequest.newBuilder()
+                .setFilter(RelationTupleFilter.newBuilder()
+                        .setResourceNamespace("rbac")
+                        .setResourceType("thing")
+                        .build())
+                .build();
+        var relResponses = StreamSupport.stream(
+                Spliterators.spliteratorUnknownSize(client.readTuples(request), Spliterator.ORDERED), false);
+        return relResponses.count();
     }
 }
