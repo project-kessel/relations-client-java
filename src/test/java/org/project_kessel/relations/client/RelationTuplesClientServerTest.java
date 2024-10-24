@@ -11,10 +11,11 @@ import org.project_kessel.api.relations.v1beta1.*;
 import java.util.List;
 import java.util.Spliterator;
 import java.util.Spliterators;
-import java.util.concurrent.Flow;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -30,6 +31,11 @@ class RelationTuplesClientServerTest {
     static void setupAll() {
         var manager = RelationsGrpcClientsManager.forInsecureClients("0.0.0.0:" + SERVER_PORT);
         client = manager.getRelationTuplesClient();
+    }
+
+    @AfterAll
+    static void tearDownAll() {
+        RelationsGrpcClientsManager.shutdownAll();
     }
 
     @BeforeEach
@@ -134,21 +140,15 @@ class RelationTuplesClientServerTest {
     void testRequestMultiFailsWithError() {
         List<Relationship> batch1 = relationshipListMaker(0, 10);
         ImportBulkTuplesRequest req1 = ImportBulkTuplesRequest.newBuilder().addAllTuples(batch1).build();
-        Multi<ImportBulkTuplesRequest> bulkTuplesRequests = Multi.createFrom().publisher(new Flow.Publisher<ImportBulkTuplesRequest>() {
-            int times = 0;
-
-            @Override
-            public void subscribe(Flow.Subscriber<? super ImportBulkTuplesRequest> subscriber) {
-                if (times++ == 0) {
-                    subscriber.onNext(req1);
-                } else {
-                    // mimics an exception thrown by any method attempting to construct a ImportBulkTuplesRequest to
-                    // supply onNext()
-                    throw new RuntimeException("AAAHHHH!");
-                }
-
-            }
-        });
+        Multi<ImportBulkTuplesRequest> bulkTuplesRequests = Multi.createFrom().items(
+                () -> IntStream.range(0, 2).mapToObj(
+                        i -> {
+                            if (i == 0) {
+                                return req1;
+                            } else {
+                                throw new RuntimeException("AAAHHHH!");
+                            }
+                        }));
         Uni<ImportBulkTuplesResponse> importBulkTuplesResponseUni = client.importBulkTuplesUni(bulkTuplesRequests);
 
         var failure = new AtomicReference<Throwable>();
