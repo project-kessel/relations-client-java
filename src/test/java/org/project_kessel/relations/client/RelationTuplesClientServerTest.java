@@ -2,6 +2,7 @@ package org.project_kessel.relations.client;
 
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,6 +11,7 @@ import org.project_kessel.api.relations.v1beta1.*;
 import java.util.List;
 import java.util.Spliterator;
 import java.util.Spliterators;
+import java.util.concurrent.Flow;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -126,6 +128,40 @@ class RelationTuplesClientServerTest {
         assertTrue(failure.get().getMessage().startsWith("UNKNOWN: error import bulk tuples: error receiving response"
                 + " from Spicedb for bulkimport request: rpc error: code = Unknown desc = ERROR: COPY from stdin "
                 + "failed: rpc error: code = InvalidArgument desc"));
+    }
+
+    @Test
+    void testRequestMultiFailsWithError() {
+        List<Relationship> batch1 = relationshipListMaker(0, 10);
+        ImportBulkTuplesRequest req1 = ImportBulkTuplesRequest.newBuilder().addAllTuples(batch1).build();
+        Multi<ImportBulkTuplesRequest> bulkTuplesRequests = Multi.createFrom().publisher(new Flow.Publisher<ImportBulkTuplesRequest>() {
+            int times = 0;
+
+            @Override
+            public void subscribe(Flow.Subscriber<? super ImportBulkTuplesRequest> subscriber) {
+                if (times++ == 0) {
+                    subscriber.onNext(req1);
+                    subscriber.onComplete();
+                } else {
+                    // mimics an exception thrown by any method attempting to construct a ImportBulkTuplesRequest to
+                    // supply onNext()
+                    throw new RuntimeException("AAAHHHH!");
+                }
+
+            }
+        });
+        Uni<ImportBulkTuplesResponse> importBulkTuplesResponseUni = client.importBulkTuplesUni(bulkTuplesRequests);
+
+        var failure = new AtomicReference<Throwable>();
+        var response = importBulkTuplesResponseUni
+                .onFailure().invoke(failure::set)
+                .onFailure().recoverWithNull()
+                .await().indefinitely();
+
+        assertNull(response);
+        assertEquals(io.grpc.StatusRuntimeException.class, failure.get().getClass());
+        assertTrue(failure.get().getMessage().startsWith(
+                "CANCELLED: Cancelled by client with StreamObserver.onError()"));
     }
 
     List<Relationship> relationshipListMaker(int startPostfix, int endPostfix) {
