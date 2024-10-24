@@ -84,6 +84,7 @@ class RelationTuplesClientServerTest {
         assertEquals(io.grpc.StatusRuntimeException.class, failure.get().getClass());
         assertTrue(failure.get().getMessage().startsWith("ALREADY_EXISTS: error import bulk tuples: error receiving "
                 + "response from Spicedb for bulkimport request"));
+        // TODO: add assert to show no relations are written -- verified manually that by looking at spicedb
     }
 
     List<Relationship> relationshipListMaker(int startPostfix, int endPostfix) {
