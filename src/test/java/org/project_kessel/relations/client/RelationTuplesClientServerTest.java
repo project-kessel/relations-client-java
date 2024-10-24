@@ -141,7 +141,6 @@ class RelationTuplesClientServerTest {
             public void subscribe(Flow.Subscriber<? super ImportBulkTuplesRequest> subscriber) {
                 if (times++ == 0) {
                     subscriber.onNext(req1);
-                    subscriber.onComplete();
                 } else {
                     // mimics an exception thrown by any method attempting to construct a ImportBulkTuplesRequest to
                     // supply onNext()
