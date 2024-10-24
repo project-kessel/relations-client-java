@@ -15,7 +15,9 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class RelationTuplesClientServerTest {
     static final int SERVER_PORT = 9000;
@@ -49,6 +51,7 @@ class RelationTuplesClientServerTest {
                 .await().indefinitely();
 
         assertEquals(15, response.getNumImported());
+        assertNull(failure.get());
         // Without read after write consistency, we try to wait for relations-api to give an updated read view
 //        try {
 //            Thread.sleep(4000);
@@ -59,7 +62,7 @@ class RelationTuplesClientServerTest {
     }
 
     @Test
-    void testProblematicBatchFails() {
+    void testCommonRelationshipInBatchesFails() {
         List<Relationship> batch1 = relationshipListMaker(0, 10);
         List<Relationship> batch2 = relationshipListMaker(9, 10); // repeat rel from batch 1 -- induce processing failure (but only at the end)
         List<Relationship> batch3 = relationshipListMaker(15, 20);
@@ -103,9 +106,37 @@ class RelationTuplesClientServerTest {
 //        assertEquals(0, countStoredRelationsips());
     }
 
+    @Test
+    void testRelationshipsWithInvalidSchemaInBatchFailure() {
+        List<Relationship> batch1 = relationshipListMaker(0, 10);
+        List<Relationship> batch2 = badRelationshipListMaker(15, 20); // create relationships for non-existent type
+        ImportBulkTuplesRequest req1 = ImportBulkTuplesRequest.newBuilder().addAllTuples(batch1).build();
+        ImportBulkTuplesRequest req2 = ImportBulkTuplesRequest.newBuilder().addAllTuples(batch2).build();
+        Multi<ImportBulkTuplesRequest> bulkTuplesRequests = Multi.createFrom().items(req1, req2);
+        Uni<ImportBulkTuplesResponse> importBulkTuplesResponseUni = client.importBulkTuplesUni(bulkTuplesRequests);
+
+        var failure = new AtomicReference<Throwable>();
+        var response = importBulkTuplesResponseUni
+                .onFailure().invoke(failure::set)
+                .onFailure().recoverWithNull()
+                .await().indefinitely();
+
+        assertNull(response);
+        assertEquals(io.grpc.StatusRuntimeException.class, failure.get().getClass());
+        assertTrue(failure.get().getMessage().startsWith("UNKNOWN: error import bulk tuples: error receiving response"
+                + " from Spicedb for bulkimport request: rpc error: code = Unknown desc = ERROR: COPY from stdin "
+                + "failed: rpc error: code = InvalidArgument desc"));
+    }
+
     List<Relationship> relationshipListMaker(int startPostfix, int endPostfix) {
         return IntStream.range(startPostfix, endPostfix).mapToObj(i ->
                 relationshipMaker("thing_" + i, "workspace_" + i)
+        ).collect(Collectors.toList());
+    }
+
+    List<Relationship> badRelationshipListMaker(int startPostfix, int endPostfix) {
+        return IntStream.range(startPostfix, endPostfix).mapToObj(i ->
+                badRelationshipMaker("thing_" + i, "workspace_" + i)
         ).collect(Collectors.toList());
     }
 
@@ -126,6 +157,25 @@ class RelationTuplesClientServerTest {
                                 .setType(ObjectType.newBuilder()
                                         .setNamespace("rbac")
                                         .setName("workspace").build())
+                                .setId(workspaceId).build())
+                        .build())
+                .setRelation("workspace")
+                .setResource(ObjectReference.newBuilder()
+                        .setType(ObjectType.newBuilder()
+                                .setNamespace("rbac")
+                                .setName("thing").build())
+                        .setId(thingId)
+                        .build())
+                .build();
+    }
+
+    Relationship badRelationshipMaker(String thingId, String workspaceId) {
+        return Relationship.newBuilder()
+                .setSubject(SubjectReference.newBuilder()
+                        .setSubject(ObjectReference.newBuilder()
+                                .setType(ObjectType.newBuilder()
+                                        .setNamespace("rbac")
+                                        .setName("nOtInSChema").build())
                                 .setId(workspaceId).build())
                         .build())
                 .setRelation("workspace")
