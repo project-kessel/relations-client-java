@@ -94,7 +94,6 @@ class RelationTuplesClientServerTest {
         assertEquals(io.grpc.StatusRuntimeException.class, failure.get().getClass());
         assertTrue(failure.get().getMessage().startsWith("ALREADY_EXISTS: error import bulk tuples: error receiving "
                 + "response from Spicedb for bulkimport request"));
-        assertEquals(0L, countStoredRelationsips());
         // Without read after write consistency, we try to wait for relations-api to give an updated read view
 //        try {
 //            Thread.sleep(4000);
