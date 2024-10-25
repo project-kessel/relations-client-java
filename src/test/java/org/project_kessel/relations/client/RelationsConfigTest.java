@@ -28,7 +28,7 @@ class RelationsConfigTest {
                             }
                     )
                     .withMapping(RelationsConfig.class)
-                    .build();
+                    .build().getConfigMapping(RelationsConfig.class);
         } catch (Exception e) {
             fail("Generating a config objective with minimal config should not fail.");
         }

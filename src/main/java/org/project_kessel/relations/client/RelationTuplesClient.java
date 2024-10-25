@@ -3,6 +3,7 @@ package org.project_kessel.relations.client;
 import io.grpc.Channel;
 import io.grpc.stub.StreamObserver;
 import io.smallrye.mutiny.Multi;
+import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.operators.multi.processors.UnicastProcessor;
 import java.util.Iterator;
 import org.project_kessel.api.relations.v1beta1.CreateTuplesRequest;
@@ -96,12 +97,40 @@ public class RelationTuplesClient extends KesselClient<KesselTupleServiceGrpc.Ke
     /**
      * Enables client streaming of ImportBulkTuplesRequests and ImportBulkTuplesResponse.
      * See https://grpc.io/docs/languages/java/basics/#client-side-streaming-rpc-1 for how to use observers in clients.
-     * We may simplify the client implementation with mutiny reactive calls in future once requirements become clearer.
      * @param responseObserver
      * @return
      */
     public StreamObserver<ImportBulkTuplesRequest> importBulkTuples(
             StreamObserver<ImportBulkTuplesResponse> responseObserver) {
         return asyncStub.importBulkTuples(responseObserver);
+    }
+
+    public Uni<ImportBulkTuplesResponse> importBulkTuplesUni(Multi<ImportBulkTuplesRequest> bulkTuplesRequests) {
+        final UnicastProcessor<ImportBulkTuplesResponse> responseProcessor = UnicastProcessor.create();
+
+        var responseObserver = new StreamObserver<ImportBulkTuplesResponse>() {
+            @Override
+            public void onNext(ImportBulkTuplesResponse response) {
+                responseProcessor.onNext(response);
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                responseProcessor.onError(t);
+            }
+
+            @Override
+            public void onCompleted() {
+                responseProcessor.onComplete();
+            }
+        };
+
+        StreamObserver<ImportBulkTuplesRequest> requestObserver = importBulkTuples(responseObserver);
+        bulkTuplesRequests.subscribe().with(
+                requestObserver::onNext,
+                requestObserver::onError,
+                requestObserver::onCompleted);
+
+        return Uni.createFrom().publisher(responseProcessor);
     }
 }
