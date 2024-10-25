@@ -1,10 +1,25 @@
 package org.project_kessel.relations.client;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
-import org.junit.jupiter.api.*;
-import org.project_kessel.api.relations.v1beta1.*;
-
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.project_kessel.api.relations.v1beta1.DeleteTuplesRequest;
+import org.project_kessel.api.relations.v1beta1.ImportBulkTuplesRequest;
+import org.project_kessel.api.relations.v1beta1.ImportBulkTuplesResponse;
+import org.project_kessel.api.relations.v1beta1.ObjectReference;
+import org.project_kessel.api.relations.v1beta1.ObjectType;
+import org.project_kessel.api.relations.v1beta1.ReadTuplesRequest;
+import org.project_kessel.api.relations.v1beta1.RelationTupleFilter;
+import org.project_kessel.api.relations.v1beta1.Relationship;
+import org.project_kessel.api.relations.v1beta1.SubjectReference;
 import java.util.List;
 import java.util.Spliterator;
 import java.util.Spliterators;
@@ -12,10 +27,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Disabled("Disabled until a relations-api test container becomes available.")
 class RelationTuplesClientServerTest {
@@ -56,20 +67,22 @@ class RelationTuplesClientServerTest {
 
         assertEquals(15, response.getNumImported());
         assertNull(failure.get());
-        // Without read after write consistency, we try to wait for relations-api to give an updated read view
-//        try {
-//            Thread.sleep(4000);
-//        } catch (InterruptedException e) {
-//            throw new RuntimeException(e);
-//        }
-//        assertEquals(15, countStoredRelationsips());
+        /*
+        Without read after write consistency, we try to wait for relations-api to give an updated read view
+        try {
+            Thread.sleep(4000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        assertEquals(15, countStoredRelationships());
+        */
     }
 
     @Test
     void testCommonRelationshipInBatchesFails() {
         List<Relationship> batch1 = relationshipListMaker(0, 10);
-        List<Relationship> batch2 = relationshipListMaker(9, 10); // repeat rel from batch 1 -- induce processing failure (but only at the end)
-        List<Relationship> batch3 = relationshipListMaker(15, 20);
+        List<Relationship> batch2 = relationshipListMaker(9, 10); // repeat rel from batch 1 -- induce processing
+        List<Relationship> batch3 = relationshipListMaker(15, 20); // failure (but only at the end)
         ImportBulkTuplesRequest req1 = ImportBulkTuplesRequest.newBuilder().addAllTuples(batch1).build();
         ImportBulkTuplesRequest req2 = ImportBulkTuplesRequest.newBuilder().addAllTuples(batch2).build();
         ImportBulkTuplesRequest req3 = ImportBulkTuplesRequest.newBuilder().addAllTuples(batch3).build();
@@ -82,14 +95,16 @@ class RelationTuplesClientServerTest {
          * debugger verifies that responseObserver onComplete() not called in error scenarios
          */
 
-        // First option -- catch Exception
-//        ImportBulkTuplesResponse response = null;
-//        try {
-//            response = importBulkTuplesResponseUni.await().indefinitely();
-//        } catch (Throwable t) {
-//            failure.set(t);
-//            // - debugger verifies that onComplete() in not called
-//        }
+        /*
+        First option -- catch Exception
+        ImportBulkTuplesResponse response = null;
+        try {
+            response = importBulkTuplesResponseUni.await().indefinitely();
+        } catch (Throwable t) {
+            failure.set(t);
+            // - debugger verifies that onComplete() in not called
+        }
+        */
 
         // Second option -- store and suppress exception and complete Uni (not responseObserver which does not complete)
         var response = importBulkTuplesResponseUni
@@ -101,13 +116,15 @@ class RelationTuplesClientServerTest {
         assertEquals(io.grpc.StatusRuntimeException.class, failure.get().getClass());
         assertTrue(failure.get().getMessage().startsWith("ALREADY_EXISTS: error import bulk tuples: error receiving "
                 + "response from Spicedb for bulkimport request"));
-        // Without read after write consistency, we try to wait for relations-api to give an updated read view
-//        try {
-//            Thread.sleep(4000);
-//        } catch (InterruptedException e) {
-//            throw new RuntimeException(e);
-//        }
-//        assertEquals(0, countStoredRelationsips());
+        /*
+        Without read after write consistency, we try to wait for relations-api to give an updated read view
+        try {
+            Thread.sleep(4000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        assertEquals(0, countStoredRelationships());
+        */
     }
 
     @Test
@@ -165,6 +182,7 @@ class RelationTuplesClientServerTest {
         ).collect(Collectors.toList());
     }
 
+    @SuppressWarnings("SameParameterValue")
     List<Relationship> badRelationshipListMaker(int startPostfix, int endPostfix) {
         return IntStream.range(startPostfix, endPostfix).mapToObj(i ->
                 badRelationshipMaker("thing_" + i, "workspace_" + i)
@@ -219,7 +237,9 @@ class RelationTuplesClientServerTest {
                 .build();
     }
 
-    long countStoredRelationsips() {
+
+    @SuppressWarnings("unused")
+    long countStoredRelationships() {
         ReadTuplesRequest request = ReadTuplesRequest.newBuilder()
                 .setFilter(RelationTupleFilter.newBuilder()
                         .setResourceNamespace("rbac")
