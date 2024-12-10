@@ -2,7 +2,6 @@ package org.project_kessel.relations.client;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
-import org.project_kessel.clients.authn.AuthenticationConfig.AuthMode;
 
 /**
  * A managed bean for providing clients for injection in apps.

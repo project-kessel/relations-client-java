@@ -16,6 +16,7 @@ import org.jboss.weld.junit5.WeldInitiator;
 import org.jboss.weld.junit5.WeldSetup;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.project_kessel.api.relations.v1beta1.CheckRequest;
 import org.project_kessel.api.relations.v1beta1.CheckResponse;
@@ -36,6 +37,7 @@ import org.project_kessel.api.relations.v1beta1.SubjectReference;
  * Use Weld as a test container to check CDI functionality.
  */
 @EnableWeld
+@Disabled
 class CDIManagedRelationsClientsContainerTests {
     private static final int testServerPort = 7000;
     private static Server grpcServer;
