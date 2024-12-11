@@ -69,6 +69,8 @@ public class AuthzPreFilterInterceptor {
                 /* Require hibernate underneath JPA/EntityManager. */
                 final Session hibernateSession = entityManager.unwrap(Session.class);
                 userTransaction.begin();
+                /* TODO: the Filter actually needs to be per-model, since the relations-api call will be per object type
+                    otherwise all annotated entities will be filtered with the ids from relations-api call. */
                 Filter authzPreFilter = hibernateSession.enableFilter(AuthzPreFilter.FILTER_NAME);
                 authzPreFilter.setParameterList(AuthzPreFilter.PARAM_NAME, resourceIds);
                 authzPreFilter.validate();
