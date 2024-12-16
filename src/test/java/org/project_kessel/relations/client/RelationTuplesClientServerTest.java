@@ -178,14 +178,14 @@ class RelationTuplesClientServerTest {
 
     List<Relationship> relationshipListMaker(int startPostfix, int endPostfix) {
         return IntStream.range(startPostfix, endPostfix).mapToObj(i ->
-                relationshipMaker("thing_" + i, "workspace_" + i)
+                relationshipMaker("widget_" + i, "workspace_" + i)
         ).collect(Collectors.toList());
     }
 
     @SuppressWarnings("SameParameterValue")
     List<Relationship> badRelationshipListMaker(int startPostfix, int endPostfix) {
         return IntStream.range(startPostfix, endPostfix).mapToObj(i ->
-                badRelationshipMaker("thing_" + i, "workspace_" + i)
+                badRelationshipMaker("widget_" + i, "workspace_" + i)
         ).collect(Collectors.toList());
     }
 
@@ -193,7 +193,7 @@ class RelationTuplesClientServerTest {
         DeleteTuplesRequest req = DeleteTuplesRequest.newBuilder()
                 .setFilter(RelationTupleFilter.newBuilder()
                         .setResourceNamespace("rbac")
-                        .setResourceType("thing")
+                        .setResourceType("widget")
                         .build())
                 .build();
         client.deleteTuples(req);
@@ -212,7 +212,7 @@ class RelationTuplesClientServerTest {
                 .setResource(ObjectReference.newBuilder()
                         .setType(ObjectType.newBuilder()
                                 .setNamespace("rbac")
-                                .setName("thing").build())
+                                .setName("widget").build())
                         .setId(thingId)
                         .build())
                 .build();
@@ -231,7 +231,7 @@ class RelationTuplesClientServerTest {
                 .setResource(ObjectReference.newBuilder()
                         .setType(ObjectType.newBuilder()
                                 .setNamespace("rbac")
-                                .setName("thing").build())
+                                .setName("widget").build())
                         .setId(thingId)
                         .build())
                 .build();
@@ -243,7 +243,7 @@ class RelationTuplesClientServerTest {
         ReadTuplesRequest request = ReadTuplesRequest.newBuilder()
                 .setFilter(RelationTupleFilter.newBuilder()
                         .setResourceNamespace("rbac")
-                        .setResourceType("thing")
+                        .setResourceType("widget")
                         .build())
                 .build();
         var relResponses = StreamSupport.stream(
