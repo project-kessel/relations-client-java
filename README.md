@@ -29,7 +29,7 @@ var checkClient = clientsManager.getCheckClient();
 ### Making requests
 #### Synchronous example
 
-Let's say we want to check whether a subject of type "user" (in the "rbac" type namespace) with id "bob" has "view" permission to a resource of type "thing" (in the "rbac" type namespace) and id "my_thing". We can make the following synchronous check request:
+Let's say we want to check whether a subject of type "principal" (in the "rbac" type namespace) with id "bob" has "view" permission to a resource of type "widget" (in the "rbac" type namespace) and id "my_thing". We can make the following synchronous check request:
 
 ```java
 var checkRequest = CheckRequest.newBuilder()
@@ -37,14 +37,14 @@ var checkRequest = CheckRequest.newBuilder()
                 .setSubject(ObjectReference.newBuilder()
                         .setType(ObjectType.newBuilder()
                                 .setNamespace("rbac")
-                                .setName("user").build())
+                                .setName("principal").build())
                         .setId("bob").build())
                 .build())
         .setRelation("view")
         .setResource(ObjectReference.newBuilder()
                 .setType(ObjectType.newBuilder()
                         .setNamespace("rbac")
-                        .setName("thing").build())
+                        .setName("widget").build())
                 .setId("my_thing")
                 .build())
         .build();
@@ -55,17 +55,17 @@ var permitted = checkResponse.getAllowed() == CheckResponse.Allowed.ALLOWED_TRUE
 
 #### Asynchronous reactive example (using Mutiny)
 
-Let's say we want to look up all of the resources of type "thing" (in the "rbac" type namespace) that a subject of type "user" (in the "rbac" type namespace) and id "bob" has "view" permission on. Since there may be many responses, we might want to operate on them asynchronously as they come in, but we may also want to collect them all afterwards and perform a synchronous operation on the list. We can make the following request using the mutiny reactive programming API to achieve both:
+Let's say we want to look up all of the resources of type "widget" (in the "rbac" type namespace) that a subject of type "principal" (in the "rbac" type namespace) and id "bob" has "view" permission on. Since there may be many responses, we might want to operate on them asynchronously as they come in, but we may also want to collect them all afterwards and perform a synchronous operation on the list. We can make the following request using the mutiny reactive programming API to achieve both:
 
 ```java
 var lookupResourcesRequest = LookupResourcesRequest.newBuilder()
         .setResourceType(ObjectType.newBuilder()
-                .setNamespace("rbac").setName("thing"))
+                .setNamespace("rbac").setName("widget"))
         .setRelation("view").setSubject(SubjectReference.newBuilder()
                 .setSubject(ObjectReference.newBuilder()
                         .setType(ObjectType.newBuilder()
                                 .setNamespace("rbac")
-                                .setName("user").build())
+                                .setName("principal").build())
                         .setId("bob").build())
                 .build()).build();
 
