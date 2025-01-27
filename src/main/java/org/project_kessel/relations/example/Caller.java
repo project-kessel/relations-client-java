@@ -29,7 +29,7 @@ public class Caller {
     static final String subjectType = "principal";
     static final String permission = "view";
     static final String namespace = "rbac";
-    static final String resourceType = "widget";
+    static final String resourceType = "integration";
     static final String resourceId = "my_thing";
 
     public static void main(String[] argv) {
@@ -49,7 +49,7 @@ public class Caller {
                 .setRelation(permission)
                 .setResource(ObjectReference.newBuilder()
                         .setType(ObjectType.newBuilder()
-                                .setNamespace(namespace)
+                                .setNamespace("notifications")
                                 .setName(resourceType).build())
                         .setId(resourceId)
                         .build())
@@ -141,7 +141,7 @@ public class Caller {
         var relationTuplesClient = clientsManager.getRelationTuplesClient();
 
         var roleBindingsOnWorkspaceFilter = RelationTupleFilter.newBuilder()
-                .setResourceNamespace(namespace)
+                .setResourceNamespace("notifications")
                 .setResourceType(resourceType).build();
         var readRelationshipsRequest = ReadTuplesRequest.newBuilder()
                 .setFilter(roleBindingsOnWorkspaceFilter).build();
@@ -223,7 +223,7 @@ public class Caller {
 
         var lookupSubjectsRequest = LookupSubjectsRequest.newBuilder().setResource(
                 ObjectReference.newBuilder()
-                        .setType(ObjectType.newBuilder().setNamespace(namespace).setName(resourceType).build())
+                        .setType(ObjectType.newBuilder().setNamespace("notifications").setName(resourceType).build())
                         .setId(resourceId))
                 .setRelation(permission)
                 .setSubjectType(ObjectType.newBuilder().setNamespace(namespace).setName(subjectType)).build();
@@ -264,7 +264,7 @@ public class Caller {
         var lookupClient = clientsManager.getLookupClient();
 
         var lookupResourcesRequest = LookupResourcesRequest.newBuilder()
-                .setResourceType(ObjectType.newBuilder().setNamespace(namespace).setName(resourceType))
+                .setResourceType(ObjectType.newBuilder().setNamespace("notifications").setName(resourceType))
                 .setRelation(permission).setSubject(SubjectReference.newBuilder()
                         .setSubject(ObjectReference.newBuilder()
                                 .setType(ObjectType.newBuilder()
