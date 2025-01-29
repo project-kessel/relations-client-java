@@ -4,6 +4,8 @@ import static org.project_kessel.relations.interceptors.utils.BeanUtils.resolveF
 import static org.project_kessel.relations.interceptors.utils.BeanUtils.resolveSubject;
 import static org.project_kessel.relations.interceptors.utils.BeanUtils.retrieveConverterFromContainer;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Produces;
 import jakarta.inject.Inject;
 import jakarta.interceptor.AroundInvoke;
 import jakarta.interceptor.Interceptor;
@@ -12,6 +14,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.transaction.UserTransaction;
 import org.hibernate.Filter;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.project_kessel.api.relations.v1beta1.LookupResourcesRequest;
 import org.project_kessel.api.relations.v1beta1.SubjectReference;
 import org.project_kessel.relations.annotations.AuthzPreFilter;
@@ -29,6 +32,7 @@ import java.util.stream.StreamSupport;
 
 @AuthzPreFilter(permission = "")
 @Interceptor
+@ApplicationScoped
 public class AuthzPreFilterInterceptor {
     @Inject
     EntityManager entityManager;
@@ -37,7 +41,12 @@ public class AuthzPreFilterInterceptor {
     LookupClient lookupClient;
 
     @Inject
-    UserTransaction userTransaction;
+    SessionFactory sessionFactory;
+
+    @Produces
+    SessionFactory getSessionFactory() {
+        return entityManager.unwrap(Session.class).getSessionFactory();
+    }
 
     @AroundInvoke
     public <T> Object preFilterByAccess(InvocationContext context) throws Exception {
@@ -67,8 +76,8 @@ public class AuthzPreFilterInterceptor {
                 }
 
                 /* Require hibernate underneath JPA/EntityManager. */
-                final Session hibernateSession = entityManager.unwrap(Session.class);
-                userTransaction.begin();
+                final Session hibernateSession = sessionFactory.openSession();
+                hibernateSession.beginTransaction();
                 /* TODO: the Filter actually needs to be per-model, since the relations-api call will be per object type
                     otherwise all annotated entities will be filtered with the ids from relations-api call. */
                 Filter authzPreFilter = hibernateSession.enableFilter(AuthzPreFilter.FILTER_NAME);
@@ -79,7 +88,7 @@ public class AuthzPreFilterInterceptor {
                 var objects = (Collection<T>) context.proceed();
 
                 hibernateSession.disableFilter(AuthzPreFilter.FILTER_NAME);
-                userTransaction.commit();
+                hibernateSession.getTransaction().commit();
 
                 return objects;
             } catch (Throwable e) {
