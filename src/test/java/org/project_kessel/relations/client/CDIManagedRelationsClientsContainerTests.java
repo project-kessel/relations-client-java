@@ -1,6 +1,5 @@
 package org.project_kessel.relations.client;
 
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.grpc.Server;
@@ -17,8 +16,11 @@ import org.jboss.weld.junit5.WeldSetup;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.project_kessel.api.relations.v1beta1.CheckForUpdateRequest;
+import org.project_kessel.api.relations.v1beta1.CheckForUpdateResponse;
 import org.project_kessel.api.relations.v1beta1.CheckRequest;
 import org.project_kessel.api.relations.v1beta1.CheckResponse;
+import org.project_kessel.api.relations.v1beta1.ConsistencyToken;
 import org.project_kessel.api.relations.v1beta1.KesselCheckServiceGrpc;
 import org.project_kessel.api.relations.v1beta1.KesselLookupServiceGrpc;
 import org.project_kessel.api.relations.v1beta1.KesselTupleServiceGrpc;
@@ -30,7 +32,6 @@ import org.project_kessel.api.relations.v1beta1.ReadTuplesRequest;
 import org.project_kessel.api.relations.v1beta1.ReadTuplesResponse;
 import org.project_kessel.api.relations.v1beta1.Relationship;
 import org.project_kessel.api.relations.v1beta1.SubjectReference;
-
 
 /**
  * Use Weld as a test container to check CDI functionality.
@@ -59,7 +60,23 @@ class CDIManagedRelationsClientsContainerTests {
         serverBuilder.addService(new KesselCheckServiceGrpc.KesselCheckServiceImplBase() {
             @Override
             public void check(CheckRequest request, StreamObserver<CheckResponse> responseObserver) {
-                responseObserver.onNext(CheckResponse.newBuilder().setAllowed(CheckResponse.Allowed.ALLOWED_TRUE)
+                responseObserver.onNext(CheckResponse.newBuilder()
+                        .setAllowed(CheckResponse.Allowed.ALLOWED_TRUE)
+                        .setConsistencyToken(
+                                ConsistencyToken.newBuilder().setToken("testconsistencytoken")
+                                        .build())
+                        .build());
+                responseObserver.onCompleted();
+            }
+
+            @Override
+            public void checkForUpdate(CheckForUpdateRequest request,
+                    StreamObserver<CheckForUpdateResponse> responseObserver) {
+                responseObserver.onNext(CheckForUpdateResponse.newBuilder()
+                        .setAllowed(CheckForUpdateResponse.Allowed.ALLOWED_TRUE)
+                        .setConsistencyToken(
+                                ConsistencyToken.newBuilder().setToken("dummytokenresponse")
+                                        .build())
                         .build());
                 responseObserver.onCompleted();
             }
@@ -106,10 +123,16 @@ class CDIManagedRelationsClientsContainerTests {
     void basicCDIWiringTest() {
         /* Make some calls to dummy services in test grpc server to test injected clients */
         var checkResponse = checkClient.check(CheckRequest.getDefaultInstance());
+        var checkForUpdateResponse = checkClient.checkForUpdate(CheckForUpdateRequest.getDefaultInstance());
         var relationTuplesResponse = relationTuplesClient.readTuples(ReadTuplesRequest.getDefaultInstance());
         var lookupResponse = lookupClient.lookupSubjects(LookupSubjectsRequest.getDefaultInstance());
 
         assertEquals(CheckResponse.Allowed.ALLOWED_TRUE, checkResponse.getAllowed());
+        assertEquals("testconsistencytoken", checkResponse.getConsistencyToken().getToken());
+
+        assertEquals(CheckForUpdateResponse.Allowed.ALLOWED_TRUE, checkForUpdateResponse.getAllowed());
+        assertEquals("dummytokenresponse", checkForUpdateResponse.getConsistencyToken().getToken());
+        
         assertEquals("TestType", relationTuplesResponse.next().getTuple().getResource().getType().getName());
         assertEquals("TestSubjectId", lookupResponse.next().getSubject().getSubject().getId());
     }
