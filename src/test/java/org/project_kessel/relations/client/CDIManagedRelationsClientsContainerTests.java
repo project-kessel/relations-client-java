@@ -75,7 +75,7 @@ class CDIManagedRelationsClientsContainerTests {
                 responseObserver.onNext(CheckForUpdateResponse.newBuilder()
                         .setAllowed(CheckForUpdateResponse.Allowed.ALLOWED_TRUE)
                         .setConsistencyToken(
-                                ConsistencyToken.newBuilder().setToken("dummytokenresponse")
+                                ConsistencyToken.newBuilder().setToken("testconsistencytoken")
                                         .build())
                         .build());
                 responseObserver.onCompleted();
@@ -90,6 +90,9 @@ class CDIManagedRelationsClientsContainerTests {
                                                                 ObjectType.newBuilder().setName("TestType"))
                                                         .build())
                                         .build())
+                                        .setConsistencyToken(ConsistencyToken.newBuilder()
+                                            .setToken("testconsistencytoken")
+                                        .build())
                         .build());
                 responseObserver.onCompleted();
             }
@@ -102,6 +105,9 @@ class CDIManagedRelationsClientsContainerTests {
                                 SubjectReference.newBuilder().setSubject(
                                                 ObjectReference.newBuilder().setId("TestSubjectId")
                                                         .build())
+                                        .build())
+                                        .setConsistencyToken(ConsistencyToken.newBuilder()
+                                            .setToken("testconsistencytoken")
                                         .build())
                         .build());
                 responseObserver.onCompleted();
@@ -124,17 +130,21 @@ class CDIManagedRelationsClientsContainerTests {
         /* Make some calls to dummy services in test grpc server to test injected clients */
         var checkResponse = checkClient.check(CheckRequest.getDefaultInstance());
         var checkForUpdateResponse = checkClient.checkForUpdate(CheckForUpdateRequest.getDefaultInstance());
-        var relationTuplesResponse = relationTuplesClient.readTuples(ReadTuplesRequest.getDefaultInstance());
-        var lookupResponse = lookupClient.lookupSubjects(LookupSubjectsRequest.getDefaultInstance());
+        var relationTuplesResponse = relationTuplesClient.readTuples(ReadTuplesRequest.getDefaultInstance()).next();
+        var lookupResponse = lookupClient.lookupSubjects(LookupSubjectsRequest.getDefaultInstance()).next();
 
         assertEquals(CheckResponse.Allowed.ALLOWED_TRUE, checkResponse.getAllowed());
         assertEquals("testconsistencytoken", checkResponse.getConsistencyToken().getToken());
 
         assertEquals(CheckForUpdateResponse.Allowed.ALLOWED_TRUE, checkForUpdateResponse.getAllowed());
-        assertEquals("dummytokenresponse", checkForUpdateResponse.getConsistencyToken().getToken());
+        assertEquals("testconsistencytoken", checkForUpdateResponse.getConsistencyToken().getToken());
         
-        assertEquals("TestType", relationTuplesResponse.next().getTuple().getResource().getType().getName());
-        assertEquals("TestSubjectId", lookupResponse.next().getSubject().getSubject().getId());
+        assertEquals("TestType", relationTuplesResponse.getTuple().getResource().getType().getName());
+        assertEquals("testconsistencytoken", relationTuplesResponse.getConsistencyToken().getToken());
+        
+        assertEquals("TestSubjectId", lookupResponse.getSubject().getSubject().getId());
+        assertEquals("testconsistencytoken", lookupResponse.getConsistencyToken().getToken());
+        
     }
 
     /*
