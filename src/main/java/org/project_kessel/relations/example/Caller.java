@@ -16,8 +16,11 @@ import org.project_kessel.api.relations.v1beta1.LookupResourcesRequest;
 import org.project_kessel.api.relations.v1beta1.ReadTuplesRequest;
 import org.project_kessel.api.relations.v1beta1.ReadTuplesResponse;
 import org.project_kessel.api.relations.v1beta1.RelationTupleFilter;
+import org.project_kessel.api.relations.v1beta1.CheckForUpdateRequest;
+import org.project_kessel.api.relations.v1beta1.CheckForUpdateResponse;
 import org.project_kessel.api.relations.v1beta1.CheckRequest;
 import org.project_kessel.api.relations.v1beta1.CheckResponse;
+import org.project_kessel.api.relations.v1beta1.Consistency;
 import org.project_kessel.api.relations.v1beta1.ObjectReference;
 import org.project_kessel.api.relations.v1beta1.ObjectType;
 import org.project_kessel.api.relations.v1beta1.SubjectReference;
@@ -52,6 +55,9 @@ public class Caller {
                                 .setNamespace(namespace)
                                 .setName(resourceType).build())
                         .setId(resourceId)
+                        .build())
+                .setConsistency(Consistency.newBuilder()
+                        .setMinimizeLatency(true)
                         .build())
                 .build();
 
@@ -128,9 +134,107 @@ public class Caller {
                 })
                 .await().indefinitely();
 
+        checkForUpdateExample();
         getRelationshipsExample();
         lookupSubjectsExample();
         lookupResourcesExample();
+    }
+
+    public static void checkForUpdateExample() {
+        var url = "localhost:9000";
+
+        var clientsManager = RelationsGrpcClientsManager.forInsecureClients(url);
+        var checkClient = clientsManager.getCheckClient();
+
+        var checkForUpdateRequest = CheckForUpdateRequest.newBuilder()
+                .setSubject(SubjectReference.newBuilder()
+                        .setSubject(ObjectReference.newBuilder()
+                                .setType(ObjectType.newBuilder()
+                                        .setNamespace(namespace)
+                                        .setName(subjectType).build())
+                                .setId(userName).build())
+                        .build())
+                .setRelation(permission)
+                .setResource(ObjectReference.newBuilder()
+                        .setType(ObjectType.newBuilder()
+                                .setNamespace(namespace)
+                                .setName(resourceType).build())
+                        .setId(resourceId)
+                        .build())
+                .build();
+
+        /*
+         * Choice of blocking v async is made by method signature.
+         * - Just CheckForUpdateRequest in args and CheckForUpdateResponse returned indicates blocking.
+         * - StreamObserver<CheckForUpdateResponse> in args indicates async.
+         */
+
+        /* Blocking */
+        var checkForUpdateResponse = checkClient.checkForUpdate(checkForUpdateRequest);
+        var permitted = checkForUpdateResponse.getAllowed() == CheckForUpdateResponse.Allowed.ALLOWED_TRUE;
+
+        if (permitted) {
+            System.out.println("Blocking: Permitted");
+        } else {
+            System.out.println("Blocking: Denied");
+        }
+
+        /*
+         * Non-blocking
+         */
+
+        final CountDownLatch conditionLatch = new CountDownLatch(1);
+        var streamObserver = new StreamObserver<CheckForUpdateResponse>() {
+            @Override
+            public void onNext(CheckForUpdateResponse response) {
+                /* Because we don't return a stream, but a response object with all the relationships inside,
+                 * we get no benefit from an async/non-blocking call right now. It all returns at once.
+                 */
+                var permitted = response.getAllowed() == CheckForUpdateResponse.Allowed.ALLOWED_TRUE;
+
+                if (permitted) {
+                    System.out.println("Non-blocking: Permitted");
+                } else {
+                    System.out.println("Non-blocking: Denied");
+                }
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                // TODO:
+            }
+
+            @Override
+            public void onCompleted() {
+                conditionLatch.countDown();
+            }
+        };
+
+        checkClient.checkForUpdate(checkForUpdateRequest, streamObserver);
+
+        /* Use a passed-in countdownlatch to wait for the result async on the main thread */
+        try {
+            conditionLatch.await();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        /*
+         * Non-blocking reactive style
+         */
+
+        Uni<CheckForUpdateResponse> uni = checkClient.checkForUpdateUni(checkForUpdateRequest);
+
+        /* Pattern where we may want collect all the responses, but still operate on each as it comes in. */
+        CheckForUpdateResponse cr = uni.onItem()
+                .invoke(() -> {
+                    if (permitted) {
+                        System.out.println("Reactive non-blocking: Permitted");
+                    } else {
+                        System.out.println("Reactive non-blocking: Denied");
+                    }
+                })
+                .await().indefinitely();
     }
 
     public static void getRelationshipsExample() {
