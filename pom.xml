@@ -85,7 +85,7 @@
     <dependency>
       <groupId>io.grpc</groupId>
       <artifactId>grpc-stub</artifactId>
-      <version>1.70.0</version>
+      <version>1.71.0</version>
     </dependency>
     <dependency>
       <groupId>build.buf</groupId>
@@ -149,7 +149,7 @@
         <configuration>
           <protocArtifact>com.google.protobuf:protoc:3.25.1:exe:${os.detected.classifier}</protocArtifact>
           <pluginId>grpc-java</pluginId>
-          <pluginArtifact>io.grpc:protoc-gen-grpc-java:1.70.0:exe:${os.detected.classifier}</pluginArtifact>
+          <pluginArtifact>io.grpc:protoc-gen-grpc-java:1.71.0:exe:${os.detected.classifier}</pluginArtifact>
         </configuration>
         <executions>
           <execution>
