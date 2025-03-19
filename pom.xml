@@ -4,7 +4,7 @@
   <groupId>org.project-kessel</groupId>
   <artifactId>relations-client-java</artifactId>
   <packaging>jar</packaging>
-  <version>1.0-SNAPSHOT</version>
+  <version>0.31</version>
   <name>Kessel Relations API Java Client Library</name>
   <description>A library providing managed clients for apps connecting to the Kessel Relations API.</description>
   <url>https://github.com/project-kessel/relations-client-java/tree/main</url>
@@ -42,7 +42,7 @@
     <dependency>
       <groupId>org.project-kessel</groupId>
       <artifactId>common-client-java</artifactId>
-      <version>0.3</version>
+      <version>0.31</version>
     </dependency>
     <dependency>
       <groupId>jakarta.enterprise</groupId>
@@ -103,7 +103,7 @@
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-core</artifactId>
-      <version>3.21.0</version>
+      <version>3.19.3</version>
       <scope>provided</scope>
     </dependency>
     <dependency> <!-- necessary for Java 9+ -->
