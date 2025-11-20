@@ -14,7 +14,7 @@ jobs:
       pull-requests: write
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Clone relations-api repo
         run: git clone --depth=1 https://github.com/project-kessel/relations-api.git
       - name: Copy proto files
