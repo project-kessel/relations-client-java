@@ -1,3 +1,5 @@
+# ⛔️ This repository is no longer actively maintained. Please consider using [kessel-sdk-java](https://github.com/project-kessel/kessel-sdk-java) instead ⛔️
+
 # relations-client-java
 Java client library for the relations api.
 
